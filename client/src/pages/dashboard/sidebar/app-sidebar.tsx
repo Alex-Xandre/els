@@ -73,7 +73,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     navMain: [
       {
         title: 'Home',
-        url: '#',
+        url: '/',
         icon: AppWindowIcon,
         isActive: true,
         isDropdown: true,
@@ -92,27 +92,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         }),
       },
       {
-        title: 'Profile',
-        url: '/sprofile',
+        title: 'Users',
+        url: '/users',
         icon: UserIcon,
-        items: [
-          {
-            title: 'Introduction',
-            url: '#',
-          },
-          {
-            title: 'Get Started',
-            url: '#',
-          },
-          {
-            title: 'Tutorials',
-            url: '#',
-          },
-          {
-            title: 'Changelog',
-            url: '#',
-          },
-        ],
+        isDropdown: true,
       },
       {
         title: 'Settings',

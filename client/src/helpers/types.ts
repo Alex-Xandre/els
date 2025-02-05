@@ -61,7 +61,7 @@ export interface SectionTypes {
   sectionType?: string;
   createdAt?: Date;
   updatedAt?: Date;
-  cover: '';
+  cover: string;
   isUnlock?: boolean;
 }
 
@@ -89,6 +89,7 @@ export interface CourseTypes {
 }
 
 export interface QuestionTypes {
+  _id?: string;
   questionText: string;
   questionType: 'multiple-choice' | 'enumeration' | 'identification' | 'essay';
   options: string[];
@@ -99,6 +100,7 @@ export interface QuestionTypes {
 }
 
 export interface AssesmentType {
+  _id: string;
   title: string;
   description: string;
   questions: QuestionTypes[];

@@ -41,8 +41,8 @@ export function NavMain({
 
   useEffect(() => {
     console.log(item, myParamValue);
-    if (item ) {
-      if (item.pathname.includes('new') || item.pathname.includes('moduleId')  ) {
+    if (item) {
+      if (item.pathname.includes('new') || item.pathname.includes('moduleId')) {
         return;
       } else {
         document.getElementById('modules')?.click();
@@ -58,7 +58,7 @@ export function NavMain({
           if (item?.isDropdown) {
             return (
               <SidebarMenuItem>
-                <SidebarMenuButton tooltip={item.title}>
+                <SidebarMenuButton tooltip={item.title} onClick={() => navigate(item.url)}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                 </SidebarMenuButton>

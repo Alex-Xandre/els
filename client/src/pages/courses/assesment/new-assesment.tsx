@@ -7,7 +7,7 @@ import { AssesmentType, QuestionTypes } from '@/helpers/types';
 import { useFetchAndDispatch } from '@/helpers/useFetch';
 import { useCourse } from '@/stores/CourseContext';
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import MultipleChoice from './multiple-choice';
 import { Button } from '@/components/ui/button';
 import Indentification from './identification';
@@ -19,25 +19,30 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import PreviewAssessment from './view-assesment-summary';
 import { questionsDummy } from './test-data';
+import { createOrUpdateAssesment } from '@/api/assessment-api';
+import toast from 'react-hot-toast';
 
 const NewAssesment = () => {
   const { modules } = useCourse();
-  useFetchAndDispatch(getAllModules, 'SET_MODULES');
-  const [assesment, setAssesment] = useState<AssesmentType>({
-    title: '',
-    description: '',
-    questions: questionsDummy,
-    moduleId: '',
-    assesmentDueDate: new Date(),
-    timeLimit: 60,
-    status: 'draft',
-    category: '',
-  });
+
   const [questionIndex, setQuestionIndex] = useState(0);
 
   const [isPreview, setIsPreview] = useState(false);
 
   const { sectionId } = useParams();
+
+  useFetchAndDispatch(getAllModules, 'SET_MODULES');
+  const [assesment, setAssesment] = useState<AssesmentType>({
+    _id: '',
+    title: '',
+    description: '',
+    questions: questionsDummy,
+    moduleId: sectionId,
+    assesmentDueDate: new Date(),
+    timeLimit: 60,
+    status: 'draft',
+    category: '',
+  });
 
   const courseId = modules.find((item) => item._id === sectionId);
   const breadcrumbItems = [
@@ -135,9 +140,20 @@ const NewAssesment = () => {
     }
   };
 
+  const navigate = useNavigate();
+  const handleSubmit = async () => {
+    const res = await createOrUpdateAssesment(assesment);
+    if (res) {
+      toast.success('Success');
+      navigate(-1);
+    }
+  };
   return (
     <Container>
-      <Title text='Lectures' />
+      <header className='inline-flex w-full justify-between pr-3'>
+        <Title text='Lectures' />
+        {isPreview && <Button onClick={handleSubmit}>Save Changes</Button>}
+      </header>
       <Breadcrumb items={breadcrumbItems} />
 
       {isPreview ? (
@@ -152,22 +168,6 @@ const NewAssesment = () => {
       ) : (
         <section className='w-full flex flex-col gap-y-3 overflow-y-auto h-[calc(100vh-200px)]'>
           <div className='inline-flex items-center w-full justify-between mt-4 sticky top-0 z-20 bg-white border-b pb-4'>
-            <div className='space-x-3'>
-              <Button
-                onClick={handlePreviousQuestion}
-                disabled={questionIndex === 0}
-              >
-                Previous
-              </Button>
-
-              <Button
-                onClick={handleNextQuestion}
-                disabled={questionIndex === assesment.questions.length - 1}
-              >
-                Next
-              </Button>
-            </div>
-
             <div className='space-x-3'>
               <Button onClick={handleNewQuestion}>Add Question</Button>
               <Button
@@ -195,8 +195,25 @@ const NewAssesment = () => {
               placeholder='Assesment Description'
             />
 
-            <Button onClick={() => setIsPreview(true)}>Publish Assesment</Button>
+            <div className='inline-flex justify-between w-full'>
+              <Button onClick={() => setIsPreview(true)}>Publish Assesment</Button>
 
+              <div className='space-x-3'>
+                <Button
+                  onClick={handlePreviousQuestion}
+                  disabled={questionIndex === 0}
+                >
+                  Previous
+                </Button>
+
+                <Button
+                  onClick={handleNextQuestion}
+                  disabled={questionIndex === assesment.questions.length - 1}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
             {assesment.questions.map((items, index) => (
               <div className={`${index !== questionIndex && 'hidden'} mt-5`}>
                 <Label className='!mt-5'>Question # {index + 1}</Label>

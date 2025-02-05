@@ -6,10 +6,10 @@ const questionSchema = new Schema(
     questionText: { type: String, required: true },
     questionType: { type: String, required: true, enum: ['multiple-choice', 'enumeration', 'identification', 'essay'] },
     options: [{ type: String }],
-    correctAnswer: { type: Schema.Types.Mixed, required: true },
+    correctAnswer: { type: Schema.Types.Mixed },
     explanation: { type: String },
     questionPoints: { type: Number, required: true },
-    difficulty: { type: String, enum: ['easy', 'medium', 'hard'], required: true },
+    difficulty: { type: String, enum: ['easy', 'medium', 'hard'], required: true, default: 'easy' },
   },
   { timestamps: true }
 );
@@ -24,7 +24,7 @@ const assesmentSchema = new Schema(
     assesmentDueDate: { type: Date, required: true },
     timeLimit: { type: Number, required: true },
     status: { type: String, enum: ['draft', 'published'], default: 'draft' },
-    category: { type: String, required: true },
+    category: { type: String },
   },
   { timestamps: true }
 );

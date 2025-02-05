@@ -3,7 +3,6 @@ import { API_ENDPOINT } from '@/config/API';
 import { handleAxiosError } from '@/config/error-handling';
 import USER_API from '@/config/header-api';
 
-
 // Course APIs
 export const createOrUpdateCourse = async (data: any) => {
   try {
@@ -82,6 +81,16 @@ export const getAllSections = async () => {
 export const getSectionDetails = async (id: string) => {
   try {
     const response = await USER_API.get(`${API_ENDPOINT}/api/courses/sections/${id}`);
+    return response.data;
+  } catch (error) {
+    return handleAxiosError(error);
+  }
+};
+
+export const getSectionOrganization = async (id: string) => {
+  try {
+    const response = await USER_API.get(`${API_ENDPOINT}/api/courses/${id}`);
+
     return response.data;
   } catch (error) {
     return handleAxiosError(error);

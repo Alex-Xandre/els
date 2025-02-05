@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CourseTypes, ModuleTypes, SectionTypes } from '@/helpers/types';
+import { AssesmentType, CourseTypes, ModuleTypes, SectionTypes } from '@/helpers/types';
 
 const CourseReducer = (state: any, action: { type: any; payload?: any }): any => {
   switch (action.type) {
@@ -87,6 +87,38 @@ const CourseReducer = (state: any, action: { type: any; payload?: any }): any =>
         ...state,
         sections: action.payload,
       };
+
+    //activity side
+    case 'SET_ACTIVITY':
+      return {
+        ...state,
+        activity: action.payload,
+      };
+
+    case 'ADD_ACTIVITY':
+      return {
+        ...state,
+        activity: [...state.activity, action.payload],
+      };
+    case 'UPDATE_ACTIVITY': {
+      const updatedActivity = action.payload;
+      const updatedActivities = state.activity.map((act: AssesmentType) =>
+        act._id === updatedActivity._id ? updatedActivity : act
+      );
+      return {
+        ...state,
+        activity: updatedActivities,
+      };
+    }
+    case 'DELETE_ACTIVITY': {
+      const activityId = action.payload;
+      const filteredActivity = state.activity.filter((act: AssesmentType) => act._id !== activityId);
+      return {
+        ...state,
+        activity: filteredActivity,
+      };
+    }
+
     default:
       return state;
   }

@@ -38,3 +38,27 @@ export interface UserTypes {
   personalData: PersonalTypes;
   email: string;
 }
+
+export interface QuestionTypes {
+  _id: string;
+  questionText: string;
+  questionType: 'multiple-choice' | 'enumeration' | 'identification' | 'essay';
+  options: string[];
+  correctAnswer: string | number | string[];
+  explanation: string;
+  questionPoints: number;
+  difficulty: 'easy' | 'medium' | 'hard';
+}
+
+export interface AssesmentType {
+  _id: string;
+  title: string;
+  description: string;
+  questions: QuestionTypes[];
+  moduleId: string;
+  assesmentDueDate: Date;
+  timeLimit: number;
+  status: 'draft' | 'published';
+  category: string;
+  cover?: string;
+}

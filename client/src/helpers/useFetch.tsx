@@ -3,16 +3,16 @@ import { useCourse } from '@/stores/CourseContext';
 
 import { useEffect } from 'react';
 
-type GetDataFn = () => Promise<any>;
+type GetDataFn = (id?: string) => Promise<any>;
 
-export const useFetchAndDispatch = (getDataFn: GetDataFn, actionType: string) => {
+export const useFetchAndDispatch = (getDataFn: GetDataFn, actionType: string, id?: string) => {
   const { dispatch: authDispatch } = useAuth();
   const { dispatch: coursesDispatch } = useCourse();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getDataFn();
+        const data = await getDataFn(id);
 
         // Dispatch to both contexts
         authDispatch({ type: actionType, payload: data });

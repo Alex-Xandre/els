@@ -2,9 +2,10 @@ import expressAsyncHandler from 'express-async-handler';
 import mongoose from 'mongoose';
 import { Course, Module, Section } from '../models/course-model';
 import { CustomRequest } from '../types';
+import { Organize } from '../models/organize-model';
 
 // Course Controllers
-export const newCourse = expressAsyncHandler(async (req:any, res) => {
+export const newCourse = expressAsyncHandler(async (req: any, res) => {
   const data = req.body;
   try {
     if (!mongoose.isValidObjectId(data._id)) {
@@ -23,7 +24,7 @@ export const newCourse = expressAsyncHandler(async (req:any, res) => {
 });
 
 export const getCourse = async (req: CustomRequest, res) => {
-  const courses = await Course.find({})
+  const courses = await Course.find({});
   return res.status(200).json(courses);
 };
 
@@ -45,7 +46,7 @@ export const getCourseWithModulesAndSections = async (req: CustomRequest, res) =
 };
 
 // Module Controllers
-export const newModule = expressAsyncHandler(async (req:any, res) => {
+export const newModule = expressAsyncHandler(async (req: any, res) => {
   const data = req.body;
   try {
     if (!mongoose.isValidObjectId(data._id)) {
@@ -79,12 +80,26 @@ export const getModuleWithSections = async (req: CustomRequest, res) => {
 };
 
 // Section Controllers
-export const newSection = expressAsyncHandler(async (req:any, res) => {
+export const newSection = expressAsyncHandler(async (req: any, res) => {
   const data = req.body;
   try {
     if (!mongoose.isValidObjectId(data._id)) {
       delete data._id;
       const createSection = await Section.create(data);
+
+      const organize = await Organize.findOne({ moduleId: data.moduleId });
+
+      if (!organize) {
+        await Organize.create({
+          moduleId: createSection.moduleId,
+          contentId: [createSection._id],
+        });
+      }
+      if (!organize.contentId.includes(createSection._id.toString())) {
+        organize.contentId.push(createSection._id.toString());
+        await organize.save();
+      }
+
       req.io.emit('update-section', createSection);
       res.status(200).json(createSection);
     } else {
@@ -107,6 +122,16 @@ export const getSectionWithModule = async (req: CustomRequest, res) => {
   try {
     const section = await Section.findById(sectionId).populate('moduleId').exec();
     res.status(200).json(section);
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+};
+
+export const getSectionOrganization = async (req: CustomRequest, res) => {
+  const sectionId = req.params.id;
+  try {
+    const sectionSequence = await Organize.findOne({ moduleId: sectionId });
+    res.status(200).json(sectionSequence);
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }

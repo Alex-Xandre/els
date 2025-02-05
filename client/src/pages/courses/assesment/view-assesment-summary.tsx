@@ -2,6 +2,7 @@ import React from 'react';
 import { AssesmentType, QuestionTypes } from '@/helpers/types';
 import { Label } from '@/components/ui/label';
 import { PencilIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface PreviewAssesmentI {
   assesment: AssesmentType;
@@ -100,7 +101,7 @@ const PreviewAssessment: React.FC<PreviewAssesmentI> = ({ assesment, hadnleQuest
       <div className='bg-white p-6 rounded-lg shadow-lg border border-gray-200'>
         <div className='flex justify-between items-center mb-6'>
           <div className='text-2xl font-semibold text-gray-800'>{assesment.title}</div>
-          <div className='text-lg text-gray-500'>{assesment.status}</div>
+          <div className='text-base text-gray-500'>{assesment.status}</div>
         </div>
 
         <p className='text-sm text-gray-600 mb-4'>{assesment.description}</p>

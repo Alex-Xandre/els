@@ -9,6 +9,7 @@ import {
   newSection,
   getSection,
   getSectionWithModule,
+  getSectionOrganization,
 } from '../controllers/course-controller';
 import protect from '../middlewares/auth-protect';
 
@@ -26,4 +27,5 @@ router.post('/sections', protect, newSection);
 router.get('/sections', protect, getSection);
 router.get('/sections/:id', protect, getSectionWithModule);
 
+router.get('/:id', protect, getSectionOrganization);
 export default router;

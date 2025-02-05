@@ -15,7 +15,7 @@ import ModulePage from './pages/courses/modules/new-module';
 import ViewModule from './pages/courses/sections/view-section';
 import ViewSection from './pages/courses/sections/new-section';
 import NewAssesment from './pages/courses/assesment/new-assesment';
-
+import UserHome from './pages/user';
 
 const App = () => {
   const { isLoggedIn, user, dispatch } = useAuth();
@@ -38,7 +38,7 @@ const App = () => {
     { path: '/', element: <Home /> },
     { path: '/courses', element: <CourseHome /> },
     { path: '/courses/new', element: <CoursePage /> },
-    
+
     { path: '/:moduleId/new', element: <ModulePage /> },
     { path: '/moduleId', element: <ViewCourse /> },
 
@@ -47,6 +47,7 @@ const App = () => {
 
     { path: '/:sectionId/new-assesment', element: <NewAssesment /> },
 
+    { path: '/users', element: <UserHome /> },
   ];
 
   const publicRoutes = [{ path: '/', element: <LoginLayout /> }];

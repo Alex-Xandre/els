@@ -15,7 +15,7 @@ import toast from 'react-hot-toast';
 const CoursePage: React.FC = () => {
   // State to manage form data
   const [course, setCourse] = useState<CourseTypes>({
-    _id: '', // Will be generated on the server
+    _id: '', 
     title: '',
     description: '',
     instructor: '',

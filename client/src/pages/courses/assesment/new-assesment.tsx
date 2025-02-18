@@ -15,12 +15,12 @@ import { Textarea } from '@/components/ui/textarea';
 import EnumerationQuestion from './enumeration';
 import EssayQuestion from './essay';
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import PreviewAssessment from './view-assesment-summary';
 import { questionsDummy } from './test-data';
 import { createOrUpdateAssesment } from '@/api/assessment-api';
 import toast from 'react-hot-toast';
+import SelectInput from '@/components/reusable-select';
 
 const NewAssesment = () => {
   const { modules } = useCourse();
@@ -41,7 +41,7 @@ const NewAssesment = () => {
     assesmentDueDate: new Date(),
     timeLimit: 60,
     status: 'draft',
-    category: '',
+    category: 'quiz',
   });
 
   const courseId = modules.find((item) => item._id === sectionId);
@@ -179,7 +179,8 @@ const NewAssesment = () => {
             </div>
           </div>
           <div className='px-1 space-y-3'>
-            <Input
+           <div className='flex gap-x-3'>
+           <Input
               type='text'
               name='title'
               value={assesment.title}
@@ -187,6 +188,16 @@ const NewAssesment = () => {
               placeholder='Assesment Title'
             />
 
+            <SelectInput
+              value={assesment.category}
+              onValueChange={(value) => {
+                setAssesment({ ...assesment, ['category']: value as any });
+              }}
+              options={['homework', 'quiz', 'activity']}
+              placeholder={'Difficulty'}
+            />
+
+           </div>
             <Textarea
               name='description'
               rows={5}
@@ -225,30 +236,44 @@ const NewAssesment = () => {
                   onChange={(e) => handleQuestionChange(index, 'questionText', e.target.value)}
                   placeholder='Question'
                 />
-                <Label className='!mt-5'> Question Type</Label>
 
-                <Select
-                  onValueChange={(value) => {
-                    handleQuestionChange(index, 'questionType', value);
-                  }}
-                  value={items.questionType}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder='Select question type' />
-                  </SelectTrigger>
+                <div className='flex gap-x-3'>
+                  <div className='flex-1'>
+                    <Label className='!mt-5'> Question Points</Label>
 
-                  <SelectContent>
-                    <SelectItem
-                      value='multiple-choice'
-                      className='hover:bg-white'
-                    >
-                      Multiple Choice
-                    </SelectItem>
-                    <SelectItem value='enumeration'>Enumeration</SelectItem>
-                    <SelectItem value='identification'>Identification</SelectItem>
-                    <SelectItem value='essay'>Essay</SelectItem>
-                  </SelectContent>
-                </Select>
+                    <Input
+                      name='questionPoints'
+                      value={items.questionPoints}
+                      onChange={(e) => handleQuestionChange(index, 'questionPoints', e.target.value)}
+                      placeholder='Points'
+                    />
+                  </div>
+
+                  <div className='flex-1'>
+                    <Label className='!mt-5'> Question Difficulty</Label>
+
+                    <SelectInput
+                      value={items.difficulty}
+                      onValueChange={(value) => {
+                        handleQuestionChange(index, 'difficulty', value.toLowerCase());
+                      }}
+                      options={['easy', 'medium', 'hard']}
+                      placeholder={'Difficulty'}
+                    />
+                  </div>
+
+                  <div className='flex-1'>
+                    <Label className='!mt-5'> Question Type</Label>
+                    <SelectInput
+                      value={items.questionType}
+                      onValueChange={(value) => {
+                        handleQuestionChange(index, 'questionType', value.toLowerCase());
+                      }}
+                      options={['enumeration', 'multiple-choice', 'identification', 'essay']}
+                      placeholder={'Question Type'}
+                    />
+                  </div>
+                </div>
               </div>
             ))}
 

@@ -8,6 +8,7 @@ import { Request, Response } from 'express';
 import User from '../models/user-model';
 import Session from '../models/session-model';
 import { CustomRequest } from '../types';
+import { userSocketMap } from '../middlewares/socket-handler';
 
 //register and update
 export const registerUser = expressAsyncHandler(async (req, res) => {
@@ -63,6 +64,9 @@ export const loginUser = expressAsyncHandler(async (req, res) => {
     if (!user) res.status(400).json({ msg: 'User not Found' });
 
     if (user && (await bcrypt.compare(password, user.password))) {
+      if (!user.status) {
+        res.status(401).json({ msg: 'Account not active' });
+      }
       // Invalidate all previous sessions for this user
       await Session.deleteMany({ user: user._id });
 
@@ -143,8 +147,61 @@ export const getUser = expressAsyncHandler(async (req: CustomRequest, res) => {
   }
 });
 
-export const getAllUsers = async (req: CustomRequest, res) => {
-  const allUser = await User.find({}).sort({ createdAt: -1 });
-  const filterUser = allUser.filter((x) => (x as any)._id.toString() !== req.user._id);
-  res.status(200).json(filterUser);
+export const getAllUsers = async (req: CustomRequest, res: Response) => {
+  try {
+    const allUsers = await User.find({}).sort({ createdAt: -1 });
+
+   
+    const filteredUsers = allUsers.filter((user) => user._id.toString() !== req.user._id);
+
+
+    const usersWithSockets = filteredUsers.map((user) => ({
+      ...user.toObject(),
+      socketId: userSocketMap.get(user._id.toString()) || null, 
+    }));
+
+    return res.status(200).json(usersWithSockets);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
 };
+
+//register
+export const registerUserByAdmin = expressAsyncHandler(async (req, res) => {
+  try {
+    const data = req.body;
+
+    if (!mongoose.isValidObjectId(data._id)) {
+      const { email, userId } = data;
+
+      if (!email || !userId) {
+        res.status(400);
+        throw new Error('Please Fill all the Fields');
+      }
+
+      const isUserEmail = await User.findOne({ email });
+      const isUsername = await User.findOne({ userId });
+
+      if (isUsername || isUserEmail) {
+        res.status(400);
+        throw new Error('User already existss');
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(data.password, salt);
+      delete data._id;
+
+      delete data.password;
+      const newUser = await User.create({ ...data, password: hashedPassword, userId });
+
+      res.status(200).json({ msg: 'User Added Succesfully', newUser });
+    } else {
+      const updateuser = await User.findByIdAndUpdate(data._id, data, { new: true });
+      res.status(200).json(updateuser);
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ msg: error.message });
+  }
+});

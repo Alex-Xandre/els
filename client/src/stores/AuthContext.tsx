@@ -14,7 +14,7 @@ interface AuthContextType {
   user: any;
   isLoggedIn: boolean;
   token: string;
-  allUser: any[];
+  allUser: UserTypes[];
   dispatch: React.Dispatch<any>;
 }
 

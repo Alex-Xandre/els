@@ -54,7 +54,7 @@ const NewSection = () => {
       if (!items) return;
       setSection(items);
     }
-  }, [section, item.search]);
+  }, [ item.search]);
 
   console.log(section);
 

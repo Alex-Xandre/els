@@ -35,8 +35,8 @@ const MultipleChoice: React.FC<MultipleChoiceI> = ({ question, index, onChange }
 
   return (
     <div className='mt-5'>
-      <div className='border bg-gray-50 p-3 my-3 rounded-md flex flex-col'>
-        <Label className='w-full font-semibold'>Choices</Label>
+      <div className='border  my-3 rounded-md flex flex-col'>
+        <Label className='w-full font-semibold pt-3 pl-3'>Choices</Label>
         {question.options.map((option, optionIndex) => (
           <div
             key={optionIndex}
@@ -72,7 +72,7 @@ const MultipleChoice: React.FC<MultipleChoiceI> = ({ question, index, onChange }
         <Button
           onClick={handleAddOption}
           variant='default'
-          className='w-fit mt-3'
+          className='w-fit mt-3 ml-3 mb-3'
         >
           Add Choices
         </Button>

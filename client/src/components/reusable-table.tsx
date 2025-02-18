@@ -1,13 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { ReactNode, useState } from 'react';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useAuth } from '@/stores/AuthContext';
 
 // Define the TableProps interface
 interface TableProps<T> {
-  data: T[]; // Array of data to display in the table
+  data: T[];
   columns: {
-    header: string; // Column header text
-    accessor: keyof T; // Key to access the data in each row
-    render?: (value: any, row: T) => React.ReactNode; // Optional custom render function
+    header: string;
+    accessor: keyof T;
+    render?: (value: any, row: T) => React.ReactNode;
   }[];
   caption?: string; // Optional table caption
   onEdit?: (row: T) => void; // Optional edit button handler
@@ -41,6 +43,7 @@ const ReusableTable = <T,>({
     }
   };
 
+  const { user } = useAuth();
   return (
     <div className='overflow-hidden w-full'>
       {tableHeader}
@@ -67,16 +70,43 @@ const ReusableTable = <T,>({
           ) : (
             currentRows.map((row, rowIndex) => (
               <TableRow key={rowIndex}>
-                {columns.map((column, columnIndex) => (
-                  <TableCell key={columnIndex}>
-                    {column.render
-                      ? column.render(row[column.accessor], row)
-                      : (row[column.accessor] as React.ReactNode)}
-                  </TableCell>
-                ))}
-                {onEdit && (
+                {columns.map((column, columnIndex) => {
+                  return (
+                    <TableCell
+                      key={columnIndex}
+                      className={`${
+                        (((row as any)?.profile && column.accessor === 'name') || column.accessor === 'status') &&
+                        'inline-flex items-center gap-x-3'
+                      }
+                      
+                   
+                      `}
+                    >
+                      {row.status === 'Online' && column.accessor === 'status' ? (
+                        <p className='h-2 w-2 rounded-full bg-green-500' />
+                      ) : row.status === 'Offline' && column.accessor === 'status' ? (
+                        <p className='h-2 w-2 rounded-full bg-red-500' />
+                      ) : (
+                        ''
+                      )}
+                      {(row as any)?.profile && column.accessor === 'name' && (
+                        <span>
+                          <img
+                            src={(row as any)?.profile}
+                            className='h-5 w-5 rounded-full'
+                          />
+                        </span>
+                      )}
+                      {column.render
+                        ? column.render(row[column.accessor], row)
+                        : (row[column.accessor] as React.ReactNode)}
+                    </TableCell>
+                  );
+                })}
+                {onEdit  && (
                   <TableCell>
-                    <button
+                   
+                   {user.role ==="admmin"&& <button
                       onClick={() => onEdit(row)}
                       className='text-green-500 mr-5'
                     >
@@ -86,8 +116,9 @@ const ReusableTable = <T,>({
                         ? 'View'
                         : 'Edit'}
                     </button>
+}
 
-                    {onView && (
+                    {onView  && (
                       <button
                         onClick={() => onView(row)}
                         className=' mr-5'

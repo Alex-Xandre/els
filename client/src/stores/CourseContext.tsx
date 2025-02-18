@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { createContext, useReducer, ReactNode, useContext } from 'react';
 import CourseReducer from './CourseReducer';
-import { AssesmentType, CourseTypes, ModuleTypes, SectionTypes } from '@/helpers/types';
+import { AssesmentType, CourseTypes, ModuleTypes, ProgressType, SectionTypes } from '@/helpers/types';
 
 interface CourseState {
   courses: CourseTypes[];
   modules: ModuleTypes[];
   sections: SectionTypes[];
   activity: AssesmentType[];
+  progress: ProgressType[];
 }
 
 interface CourseContextType {
@@ -15,6 +16,7 @@ interface CourseContextType {
   modules: ModuleTypes[];
   sections: SectionTypes[];
   activity: AssesmentType[];
+  progress: ProgressType[];
   dispatch: React.Dispatch<any>;
 }
 
@@ -23,6 +25,7 @@ const INITIAL_STATE: CourseState = {
   modules: [],
   sections: [],
   activity: [],
+  progress: [],
 };
 
 export const CourseContext = createContext<CourseContextType | undefined>(undefined);
@@ -33,6 +36,7 @@ export const CourseContextProvider: React.FC<{ children: ReactNode }> = ({ child
   return (
     <CourseContext.Provider
       value={{
+        progress: state.progress,
         courses: state.courses,
         modules: state.modules,
         sections: state.sections,

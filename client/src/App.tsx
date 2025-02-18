@@ -16,6 +16,7 @@ import ViewModule from './pages/courses/sections/view-section';
 import ViewSection from './pages/courses/sections/new-section';
 import NewAssesment from './pages/courses/assesment/new-assesment';
 import UserHome from './pages/user';
+import NewUser from './pages/user/new';
 
 const App = () => {
   const { isLoggedIn, user, dispatch } = useAuth();
@@ -48,8 +49,21 @@ const App = () => {
     { path: '/:sectionId/new-assesment', element: <NewAssesment /> },
 
     { path: '/users', element: <UserHome /> },
+    { path: '/users/new', element: <NewUser /> },
   ];
 
+
+
+  
+  const studentRoutes = [
+    { path: '/', element: <Home /> },
+    { path: '/courses', element: <CourseHome /> },
+    { path: '/moduleId', element: <ViewCourse /> },
+    { path: '/:moduleId/view', element: <ViewModule /> },
+    { path: '/users', element: <UserHome /> },
+  ];
+
+  
   const publicRoutes = [{ path: '/', element: <LoginLayout /> }];
 
   const renderRoutes = useCallback(() => {
@@ -58,6 +72,16 @@ const App = () => {
         {isLoggedIn &&
           user.role === 'admin' &&
           adminRoutes.map((route) => (
+            <Route
+              key={route.path}
+              path={route.path}
+              element={route.element}
+            />
+          ))}
+
+        {isLoggedIn &&
+          user.role === 'user' &&
+          studentRoutes.map((route) => (
             <Route
               key={route.path}
               path={route.path}

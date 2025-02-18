@@ -26,8 +26,10 @@ export interface PersonalTypes {
   birthday?: string;
   birthplace?: string;
   address: AddressTypes;
-  profile: string;
+
   age: number;
+  sex: string;
+  contact: number;
 }
 
 //user types
@@ -37,6 +39,8 @@ export interface UserTypes {
   userId: string;
   personalData: PersonalTypes;
   email: string;
+  profile: string;
+  status:boolean
 }
 
 export interface QuestionTypes {
@@ -61,4 +65,9 @@ export interface AssesmentType {
   status: 'draft' | 'published';
   category: string;
   cover?: string;
+
+
+  sectionType?: string;
+  attempts?: number;
+
 }

@@ -68,7 +68,9 @@ const PreviewAssessment: React.FC<PreviewAssesmentI> = ({ assesment, hadnleQuest
     }
   };
 
-  const totalPoints = assesment.questions.reduce((total, question) => total + question.questionPoints, 0);
+
+  console.log(assesment.questions.map((x) => x.questionPoints))
+  const totalPoints = assesment.questions.reduce((total, question) => total + parseInt(question.questionPoints), 0);
 
   const difficultyClass = (difficulty: string) => {
     switch (difficulty) {

@@ -9,7 +9,6 @@ cloudinary.config({
 });
 const uploadController = {
   uploadAvatar: async (req, res) => {
-    console.log(req.file);
     try {
       //getfile
       const file = req.file;
@@ -18,6 +17,7 @@ const uploadController = {
         file.path,
         {
           folder: 'docs',
+          resource_type: 'auto',
         },
         (err, result) => {
           if (err) throw err;
@@ -29,7 +29,7 @@ const uploadController = {
         }
       );
     } catch (err) {
-      console.log(err);
+      console.log('d');
     }
   },
 };

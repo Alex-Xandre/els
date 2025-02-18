@@ -119,6 +119,24 @@ const CourseReducer = (state: any, action: { type: any; payload?: any }): any =>
       };
     }
 
+    // Progress tracking
+    case 'SET_PROGRESS':
+      return {
+        ...state,
+        progress: action.payload,
+      };
+    case 'UPDATE_PROGRESS': {
+      const { courseId, progress } = action.payload;
+      const updatedProgress = {
+        ...state.progress,
+        [courseId]: progress,
+      };
+      return {
+        ...state,
+        progress: updatedProgress,
+      };
+    }
+
     default:
       return state;
   }

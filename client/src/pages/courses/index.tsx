@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import ReusableTable from '@/components/reusable-table';
 import Container from '@/components/container';
 import Title from '@/components/ui/title';
@@ -6,17 +7,21 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useCourse } from '@/stores/CourseContext';
 import { useFetchAndDispatch } from '@/helpers/useFetch';
-import { getAllCourses } from '@/api/course.api';
+import { getAllCourses, getAllModules } from '@/api/course.api';
 import Breadcrumb from '@/components/bread-crumb';
-
+import { useAuth } from '@/stores/AuthContext';
 const CourseHome = () => {
-  const { courses } = useCourse();
+  const { courses, modules} = useCourse();
+  const { user } = useAuth();
   useFetchAndDispatch(getAllCourses, 'SET_COURSES');
+  useFetchAndDispatch(getAllModules, 'SET_MODULES');
+ 
 
   const columns = [
-    { header: 'ID', accessor: '_id' },
+    ...(user.role === 'admin' ? [{ header: 'ID', accessor: '_id' }] : []),
     { header: 'Title', accessor: 'title' },
     { header: 'Description', accessor: 'description' },
+    { header: 'Contents Inside', accessor: 'content' },
   ];
 
   const breadcrumbItems = [
@@ -24,6 +29,8 @@ const CourseHome = () => {
     { label: 'Modules', isCurrentPage: true },
   ];
 
+  
+  
   const navigate = useNavigate();
   return (
     <Container>
@@ -32,10 +39,16 @@ const CourseHome = () => {
         tableHeader={
           <NavContainer>
             <Title text='List of Module' />
-            <Button onClick={() => navigate('new')}>Create Module</Button>
+            {user.role === 'admin' && <Button onClick={() => navigate('new')}>Create Module</Button>}
           </NavContainer>
         }
-        data={courses}
+        data={courses.map((item) =>{
+          return{
+            ...item,
+            content: modules.filter((x) =>(x.courseId as any)?._id === item._id).length
+
+          }
+        })}
         columns={columns as any}
         caption='A list of your modules'
         onEdit={(item) => navigate(`/courses/new?=${item?._id}`, { state: { isEdit: true } })}

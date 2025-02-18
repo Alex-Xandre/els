@@ -32,7 +32,7 @@ export interface PersonalTypes {
   birthday?: string;
   birthplace?: string;
   address: AddressTypes;
-  profile: string;
+
   age: number;
   sex: string;
   civilStatus: string;
@@ -48,6 +48,8 @@ export interface UserTypes {
   _id: string;
   personalData: PersonalTypes;
   email: string;
+  profile: string;
+  status: boolean;
 }
 
 // Section type
@@ -108,5 +110,24 @@ export interface AssesmentType {
   assesmentDueDate: Date;
   timeLimit: number;
   status: 'draft' | 'published';
-  category: string;
+
+  category: 'homework' | 'quiz' | 'activity';
+  sectionType?: string;
+  attempts?: number;
+}
+
+export interface ProgressType {
+  _id: string;
+  studentId: string;
+  completedLessons: string[];
+}
+
+export interface SubmissionType {
+  user: string;
+  activityId: string;
+  answers: any;
+  submissionDate: Date;
+  attempts: number;
+  score: number;
+  isGraded: number;
 }

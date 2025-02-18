@@ -96,3 +96,30 @@ export const getSectionOrganization = async (id: string) => {
     return handleAxiosError(error);
   }
 };
+
+export const updateProgress = async (studentId: string, lessonId: string) => {
+  try {
+    const response = await USER_API.post(`${API_ENDPOINT}/api/progress/update`, { studentId, lessonId });
+    return response.data;
+  } catch (error) {
+    return handleAxiosError(error);
+  }
+};
+
+export const getStudentProgress = async (studentId: string) => {
+  try {
+    const response = await USER_API.get(`${API_ENDPOINT}/api/progress/${studentId}`);
+    return response.data;
+  } catch (error) {
+    return handleAxiosError(error);
+  }
+};
+
+export const checkLessonUnlock = async (studentId: string, previousLessonId?: string) => {
+  try {
+    const response = await USER_API.post(`${API_ENDPOINT}/api/progress/check-unlock`, { studentId, previousLessonId });
+    return response.data;
+  } catch (error) {
+    return handleAxiosError(error);
+  }
+};

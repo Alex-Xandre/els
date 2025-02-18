@@ -33,7 +33,7 @@ import { getAllCourses } from '@/api/course.api';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { toggleSidebar, open } = useSidebar();
-  const { dispatch } = useAuth();
+  const { dispatch, user } = useAuth();
   const nav = useNavigate();
   const { courses } = useCourse();
 
@@ -91,12 +91,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           };
         }),
       },
-      {
-        title: 'Users',
-        url: '/users',
-        icon: UserIcon,
-        isDropdown: true,
-      },
+      ...(user.role === 'admin'
+        ? [
+            {
+              title: 'Students',
+              url: '/users',
+              icon: UserIcon,
+              isDropdown: true,
+            },
+          ]
+        : []),
       {
         title: 'Settings',
         url: '/settings',
@@ -145,15 +149,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       collapsible='icon'
       {...props}
     >
-      <button
-        onClick={toggleSidebar}
-        className='absolute -right-10 top-3 bg-white  p-1.5 cursor-pointer   shadow-sm rounded-sm w-fit'
-      >
-        {open ? <XIcon /> : <PanelLeft className='' />}
-      </button>
+      <nav className=' border-b absolute top-0 z-50 h-12 w-screen justify-between inline-flex'>
+        <button
+          onClick={toggleSidebar}
+          className=' bg-white  p-1.5 m-1.5 cursor-pointer   shadow-sm rounded-sm w-fit'
+        >
+          {open ? <XIcon className='h-4' /> : <PanelLeft className='h-4' />}
+        </button>
+
+        <p className={`absolute font-semibold top-3 ${open ? 'left-64 ml-10' : 'left-16 ml-2'}`}> </p>
+      </nav>
 
       <SidebarHeader>{/* <TeamSwitcher teams={data.teams} /> */}</SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className='mt-14'>
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>

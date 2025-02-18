@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getAllModules } from '@/api/course.api';
+import { getAllModules, getAllSections } from '@/api/course.api';
 import Container from '@/components/container';
 import NavContainer from '@/components/nav-container';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,8 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ModuleCard from './module-card';
 import Breadcrumb from '@/components/bread-crumb';
+import { useAuth } from '@/stores/AuthContext';
+import { getAllAssessment } from '@/api/assessment-api';
 
 const ViewCourse = () => {
   const [course, setCourse] = useState<CourseTypes>({
@@ -24,8 +26,12 @@ const ViewCourse = () => {
 
   const item = useLocation();
   const { courses, modules } = useCourse();
+  const { user } = useAuth();
 
   useFetchAndDispatch(getAllModules, 'SET_MODULES');
+  useFetchAndDispatch(getAllAssessment, 'SET_ACTIVITY');
+  useFetchAndDispatch(getAllSections, 'SET_SECTIONS');
+
   const searchParams = new URLSearchParams(item.search);
   const myParamValue = searchParams.get('');
 
@@ -48,7 +54,7 @@ const ViewCourse = () => {
     <Container>
       <NavContainer>
         <Title text={course?.title} />
-        <Button onClick={() => navigate(`/${myParamValue}/new`)}>Add Section</Button>
+        {user.role === 'admin' && <Button onClick={() => navigate(`/${myParamValue}/new`)}>Add Section</Button>}
       </NavContainer>
 
       <Breadcrumb items={breadcrumbItems} />

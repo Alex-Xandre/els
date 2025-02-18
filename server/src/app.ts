@@ -9,6 +9,7 @@ import courseRoute from './routes/course-route';
 import { socketHandler } from './middlewares/socket-handler';
 import uploadRoute from './routes/upload.routes';
 import assessmentRoute from './routes/assessment-route';
+import progressRoute from './routes/progress-routes';
 
 dotenv.config();
 
@@ -48,6 +49,7 @@ app.use('/api/auth', userRoute);
 app.use('/api/courses', courseRoute);
 app.use('/api/upload', uploadRoute);
 app.use('/api/assessment', assessmentRoute);
+app.use('/api/progress', progressRoute);
 // Static files
 app.use('/uploads', express.static('uploads'));
 

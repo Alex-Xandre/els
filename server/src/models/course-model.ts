@@ -24,7 +24,7 @@ const sectionSchema = new Schema(
     isUnlock: { type: Boolean, default: false },
     moduleId: { type: Schema.Types.ObjectId, ref: 'Module', required: true },
     sectionType: String,
-    cover: { type: String, default: getRandomCover },
+    cover: { type: String, default: getRandomCover() },
   },
   { timestamps: true }
 );
@@ -35,7 +35,7 @@ const moduleSchema = new Schema(
     title: { type: String, required: true },
     description: { type: String, required: true },
     courseId: { type: Schema.Types.ObjectId, ref: 'Course', required: true },
-    cover: { type: String, default: getRandomCover },
+    cover: { type: String, default: getRandomCover() },
   },
   { timestamps: true }
 );
@@ -47,7 +47,7 @@ const courseSchema = new Schema(
     description: { type: String },
     instructor: { type: String },
     category: { type: String },
-    cover: { type: String, default: getRandomCover },
+    cover: { type: String, default: getRandomCover() },
   },
   { timestamps: true }
 );

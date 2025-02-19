@@ -5,10 +5,20 @@ interface InputProps extends React.ComponentProps<'input'> {
   icon?: React.ReactNode;
 }
 
-const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type, icon, ...props }, ref) => {
-  return (
-    <div className='relative w-full'>
-      {icon && <div className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400'>{icon}</div>}
+const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type, icon, placeholder, ...props }, ref) => {
+  return type === 'checkbox' ? (
+    <label className="flex h-9 items-center gap-2">
+      <input
+        type="checkbox"
+        className="h-4 w-4 rounded border border-input text-primary shadow-sm focus-visible:ring-1 focus-visible:ring-ring"
+        ref={ref}
+        {...props}
+      />
+      {placeholder && <span className="text-sm text-muted-foreground">{placeholder}</span>}
+    </label>
+  ) : (
+    <div className="relative w-full">
+      {icon && <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">{icon}</div>}
       <input
         type={type}
         className={cn(

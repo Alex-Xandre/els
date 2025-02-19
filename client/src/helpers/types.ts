@@ -108,12 +108,15 @@ export interface AssesmentType {
   questions: QuestionTypes[];
   moduleId: string;
   assesmentDueDate: Date;
+
   timeLimit: number;
   status: 'draft' | 'published';
 
   category: 'homework' | 'quiz' | 'activity';
   sectionType?: string;
   attempts?: number;
+  isLate?: boolean;
+  startDate: Date;
 }
 
 export interface ProgressType {

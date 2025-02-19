@@ -6,8 +6,8 @@ import Title from '@/components/ui/title';
 import { AssesmentType, QuestionTypes } from '@/helpers/types';
 import { useFetchAndDispatch } from '@/helpers/useFetch';
 import { useCourse } from '@/stores/CourseContext';
-import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import MultipleChoice from './multiple-choice';
 import { Button } from '@/components/ui/button';
 import Indentification from './identification';
@@ -18,12 +18,12 @@ import EssayQuestion from './essay';
 import { Label } from '@/components/ui/label';
 import PreviewAssessment from './view-assesment-summary';
 import { questionsDummy } from './test-data';
-import { createOrUpdateAssesment } from '@/api/assessment-api';
+import { createOrUpdateAssesment, getAllAssessment } from '@/api/assessment-api';
 import toast from 'react-hot-toast';
 import SelectInput from '@/components/reusable-select';
 
 const NewAssesment = () => {
-  const { modules } = useCourse();
+  const { modules, activity } = useCourse();
 
   const [questionIndex, setQuestionIndex] = useState(0);
 
@@ -38,6 +38,7 @@ const NewAssesment = () => {
     description: '',
     questions: questionsDummy,
     moduleId: sectionId,
+    startDate: new Date(),
     assesmentDueDate: new Date(),
     timeLimit: 60,
     status: 'draft',
@@ -45,6 +46,25 @@ const NewAssesment = () => {
   });
 
   const courseId = modules.find((item) => item._id === sectionId);
+
+  useFetchAndDispatch(getAllAssessment, 'SET_ACTIVITY');
+  const item = useLocation();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(item.search);
+    const myParamValue = searchParams.get('');
+
+    if (myParamValue) {
+      const items = activity.find((item) => item._id === myParamValue);
+
+      if (!items) return;
+
+      setAssesment({ ...items,
+        startDate: new Date( items.startDate? items.startDate : new Date())?.toISOString().slice(0, 16) as any ,
+        assesmentDueDate: new Date(items.assesmentDueDate)?.toISOString().slice(0, 16) as any });
+    }
+  }, [item.search]);
+
   const breadcrumbItems = [
     { label: 'Home', href: '/' },
     { label: `${courseId?.title}`, href: `/${courseId?.courseId?._id}/view?=${sectionId}` },
@@ -179,25 +199,79 @@ const NewAssesment = () => {
             </div>
           </div>
           <div className='px-1 space-y-3'>
-           <div className='flex gap-x-3'>
-           <Input
-              type='text'
-              name='title'
-              value={assesment.title}
-              onChange={handleAssesmentChange}
-              placeholder='Assesment Title'
-            />
+            <div className='flex gap-x-3'>
+              <div className='w-full space-y-3'>
+                <div className='w-full'>
+                  <Label>Title</Label>
+                  <Input
+                    type='text'
+                    name='title'
+                    value={assesment.title}
+                    onChange={handleAssesmentChange}
+                    placeholder='Assesment Title'
+                  />
+                </div>
 
-            <SelectInput
-              value={assesment.category}
-              onValueChange={(value) => {
-                setAssesment({ ...assesment, ['category']: value as any });
-              }}
-              options={['homework', 'quiz', 'activity']}
-              placeholder={'Difficulty'}
-            />
+                <div className='w-full'>
+                  <Label>Type Date</Label>
 
-           </div>
+                  <SelectInput
+                    value={assesment.category}
+                    onValueChange={(value) => {
+                      setAssesment({ ...assesment, ['category']: value as any });
+                    }}
+                    options={['homework', 'quiz', 'activity']}
+                    placeholder={'Difficulty'}
+                  />
+                </div>
+              </div>
+
+              <div className='space-y-3'>
+                <div>
+                  <Label> Submission</Label>
+                  <Input
+                    type='checkbox'
+                    name='isLate'
+                    checked={assesment?.isLate}
+                    onChange={(e) => setAssesment((prev) => ({ ...prev, isLate: e.target.checked }))}
+                    placeholder='Allow Late?'
+                  />
+                </div>
+                <div>
+                  <Label>Max Attempts</Label>
+                  <Input
+                    type='number'
+                    name='attempts'
+                    value={assesment.attempts}
+                    onChange={handleAssesmentChange}
+                    placeholder='Assesment Title'
+                  />
+                </div>
+              </div>
+
+              <div className='space-y-3'>
+                <div>
+                  <Label>Start Date</Label>
+                  <Input
+                    type='datetime-local'
+                    name='startDate'
+                    value={assesment.startDate as any}
+                    onChange={handleAssesmentChange}
+                    placeholder='Assesment Title'
+                  />
+                </div>
+                <div>
+                  <Label>Due Date</Label>
+                  <Input
+                    type='datetime-local'
+                    name='assesmentDueDate'
+                    value={assesment.assesmentDueDate as any}
+                    onChange={handleAssesmentChange}
+                    placeholder='Assesment Title'
+                  />
+                </div>
+              </div>
+            </div>
             <Textarea
               name='description'
               rows={5}

@@ -42,11 +42,13 @@ export const newAssessment = expressAsyncHandler(async (req: any, res) => {
       const updatedQuestions = [];
 
       for (let questionData of data.questions) {
-        if (!mongoose.isValidObjectId(data._id)) {
+        if (mongoose.isValidObjectId(questionData._id)) {
+          // If the _id exists, update the existing question
           const updatedQuestion = await Question.findByIdAndUpdate(questionData._id, questionData, { new: true });
           updatedQuestions.push(updatedQuestion._id);
         } else {
-          const newQuestion = await Question.create(questionData);
+          // If no valid _id, create a new question
+          const newQuestion = await Question.create({ ...questionData, _id: undefined }); // Ensure MongoDB generates a new _id
           updatedQuestions.push(newQuestion._id);
         }
       }
@@ -121,7 +123,7 @@ export const getSubmissions = async (req: CustomRequest, res) => {
   const assessment = await Submissions.find({ activityId: req.params.id });
 
   const filteredAssessment =
-    req.user.role === 'admin' ? assessment : assessment.filter((x) => x.user.toString() === req.user._id);
+    req.user.role === 'admin' ? assessment : assessment.filter((x) => x.user.toString() === req.user._id.toString());
 
-  return res.status(200).json(filteredAssessment);
+  res.status(200).json(filteredAssessment);
 };

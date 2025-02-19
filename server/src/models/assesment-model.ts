@@ -27,6 +27,8 @@ const assesmentSchema = new Schema(
     status: { type: String, enum: ['draft', 'published'], default: 'draft' },
     category: { type: String, default: 'quiz' },
     attempts: Number,
+    isLate: { type: Boolean, default: false },
+    startDate: Date,
   },
   { timestamps: true }
 );
@@ -47,4 +49,4 @@ const submissionSchema = new Schema({
 // Models
 export const Assesment = model('Assesment', assesmentSchema);
 export const Question = model('Question', questionSchema);
-export const Submissions = model("Submissions", submissionSchema)
+export const Submissions = model('Submissions', submissionSchema);

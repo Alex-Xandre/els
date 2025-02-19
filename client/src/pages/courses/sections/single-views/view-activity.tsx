@@ -1,15 +1,17 @@
-import { createSubmission, getAllAssessment } from '@/api/assessment-api';
+import { createSubmission, getAllAssessment, getSubmisions } from '@/api/assessment-api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { AssesmentType } from '@/helpers/types';
+import { AssesmentType, SubmissionType } from '@/helpers/types';
 import { useFetchAndDispatch } from '@/helpers/useFetch';
 import { useCourse } from '@/stores/CourseContext';
-import { ClockIcon, GoalIcon, RotateCwIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/stores/AuthContext';
+import { useSidebar } from '@/components/ui/sidebar';
+import { BarChartIcon, CalendarIcon, CheckIcon, ClockIcon, KeyIcon, XIcon } from 'lucide-react';
+import { formatDate } from '../../assesment/formatTime';
 
 const Assessment = ({ assessmentProp }) => {
   const [assessment, setAssessment] = useState<AssesmentType>(
@@ -26,11 +28,14 @@ const Assessment = ({ assessmentProp }) => {
       attempts: 1,
     }
   );
+
+  const [submissionData, setSubmissionData] = useState<undefined | SubmissionType>(undefined);
+
   const location = useLocation();
   const params = new URLSearchParams(location.search);
 
   const examId = params.get('examId');
-  const { activity } = useCourse();
+  const { activity, submissions } = useCourse();
 
   useFetchAndDispatch(getAllAssessment, 'SET_ACTIVITY');
 
@@ -56,7 +61,7 @@ const Assessment = ({ assessmentProp }) => {
     }, {})
   );
 
-  const { questions, title, timeLimit } = assessment;
+  const { questions, title } = assessment;
   const totalPoints = questions.reduce((acc, question) => acc + question.questionPoints, 0);
 
   // Timer logic
@@ -105,10 +110,11 @@ const Assessment = ({ assessmentProp }) => {
       isGraded: 0,
     });
     console.log(res);
+
+    setIsSubmitted(true);
+
     // Handle actual submission logic here
   };
-
-  console.log(answers);
 
   const handleAnswerChange = (questionId, value) => {
     setAnswers((prevAnswers) => ({
@@ -137,7 +143,7 @@ const Assessment = ({ assessmentProp }) => {
     const isCorrect = userAnswer === correctAnswer;
     return isCorrect ? score + question.questionPoints : score;
   }, 0);
-
+  const lastItemScore = submissions.length > 0 ? submissions[submissions.length - 1].score : null;
   const renderQuestionInput = (question) => {
     if (!question) {
       return null;
@@ -202,121 +208,251 @@ const Assessment = ({ assessmentProp }) => {
     }
   };
 
-  console.log(answers);
-  console.log(questions);
+  const { open } = useSidebar();
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      const message = 'Are you sure you want to leave? Your progress may be lost and this will be submitted!';
+      event.preventDefault();
+      event.returnValue = message;
+      return message;
+    };
+
+    const handlePopState = () => {
+      if (window.confirm('Are you sure you want to leave? Your progress may be lost and this will be submitted!')) {
+        handleUserConfirmedExit();
+        return;
+      } else {
+        // Push state again to prevent back navigation
+        // window.history.pushState(null, '', window.location.href);
+      }
+    };
+
+    if ( assessment.attempts > submissions.length) {
+      // Push initial state to prevent immediate back navigation
+      window.history.pushState(null, '', window.location.href);
+
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      window.addEventListener('popstate', handlePopState);
+    }
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
+  const navigate = useNavigate();
+
+  // External function to handle user confirmation
+  const handleUserConfirmedExit = async () => {
+    const res = await createSubmission({
+      user: user._id,
+      activityId: examId,
+      answers: answers,
+      submissionDate: new Date(),
+      attempts: 1,
+      score: totalScore,
+      isGraded: 0,
+    });
+    navigate(-1);
+  };
+
+  useEffect(() => {
+    if (submissions.length >= assessment.attempts) {
+      setIsSubmitted(true);
+      setIsPreview(true);
+
+      setAnswers(submissions[submissions.length - 1].answers);
+    }
+  }, []);
+
   return (
-    <div className='flex w-full'>
-      {isPreview ? (
-        <ScrollArea className='bg-white pr-6 flex-1 w-full rounded-lg overflow-y-auto h-[calc(100vh-100px)]'>
-          <h3 className='font-semibold mb-4'>Preview Submission</h3>
-          <p className='text-xs mb-5'>Your answers are ready for preview before final submission.</p>
+    <main className={`  ${!open ? 'pl-16' : 'pl-72'} inset-0 z-50  absolute flex flex-wrap mt-20 pr-5`}>
+      <div className='flex w-full '>
+        {isPreview ? (
+          <ScrollArea className='bg-white pr-6 flex-1 w-full rounded-lg overflow-y-auto h-[calc(100vh-100px)]'>
+            <h3 className='font-semibold mb-4'>Preview Submission</h3>
+            <p className='text-xs mb-5'>Your answers are ready for preview before final submission.</p>
 
-          <div>
-            {questions.map((question, index) => {
-              const userAnswer = (answers[question._id] || '').toString().trim().toLowerCase();
-              const correctAnswer = Array.isArray(question.correctAnswer)
-                ? question.correctAnswer
-                    .map((ans) => ans.toLowerCase())
-                    .sort()
-                    .join(', ')
-                : question.correctAnswer.toString().trim().toLowerCase();
+            {isSubmitted && (
+              <div>
+                {questions.map((question, index) => {
+                  const userAnswer = (answers[question._id] || '').toString().trim().toLowerCase();
+                  const correctAnswer = Array.isArray(question.correctAnswer)
+                    ? question.correctAnswer
+                        .map((ans) => ans.toLowerCase())
+                        .sort()
+                        .join(', ')
+                    : question.correctAnswer.toString().trim().toLowerCase();
 
-              const isEssay = question.questionType === 'essay';
-              const isCorrect = !isEssay && userAnswer === correctAnswer;
+                  const isEssay = question.questionType === 'essay';
+                  const isCorrect = !isEssay && userAnswer === correctAnswer;
 
-              return (
-                <div
-                  key={question._id}
-                  className='mb-4 border w-full p-2 rounded-md'
-                >
-                  <h4 className='text-sm font-semibold'>{`Question ${index + 1}: ${question.questionText}`}</h4>
-                  <div className='mt-2'>
-                    <h2 className='text-xs'>Your Answer:</h2>
-                    <p className='text-xs'>{answers[question._id] || 'No answer provided'}</p>
+                  return (
+                    <div
+                      key={question._id}
+                      className='mb-4 border w-full p-2 rounded-md'
+                    >
+                      <h4 className='text-sm font-semibold'>{`Question ${index + 1}: ${question.questionText}`}</h4>
+                      <div className='mt-2'>
+                        <h2 className='text-xs'>Your Answer:</h2>
+                        <p className='text-xs'>{answers[question._id] || 'No answer provided'}</p>
 
-                    {!isEssay && (
-                      <>
-                        <h2 className='text-xs mt-2'>Correct Answer:</h2>
-                        <p className='text-xs'>
-                          {Array.isArray(question.correctAnswer)
-                            ? question.correctAnswer.join(', ')
-                            : question.correctAnswer}
-                        </p>
+                        {!isEssay && (
+                          <>
+                            <h2 className='text-xs mt-2'>Correct Answer:</h2>
+                            <p className='text-xs'>
+                              {Array.isArray(question.correctAnswer)
+                                ? question.correctAnswer.join(', ')
+                                : question.correctAnswer}
+                            </p>
 
-                        <div className='flex items-center gap-2 mt-2'>
-                          <span className='text-xs font-semibold'>{isCorrect ? '✔️ Correct' : '❌ Wrong'}</span>
-                        </div>
-                      </>
-                    )}
+                            <div className='flex items-center gap-2 mt-2'>
+                              <span className='text-xs font-semibold'>{isCorrect ? '✔️ Correct' : '❌ Wrong'}</span>
+                            </div>
+                          </>
+                        )}
 
-                    {isEssay && (
-                      <div className='flex items-center gap-2 mt-2'>
-                        <span className='text-xs font-semibold'>-</span>
+                        {isEssay && (
+                          <div className='flex items-center gap-2 mt-2'>
+                            <span className='text-xs font-semibold'>-</span>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
-            <div className='mt-4 p-2 border rounded-md'>
-              <h2 className='text-lg font-semibold'>Total Score: {totalScore}</h2>
+            {!isSubmitted && (
+              <>
+                {questions.map((question, index) => {
+                  const answer = answers[question._id] || '';
+                  return (
+                    <div
+                      key={question._id}
+                      className='mb-4 border w-full p-2 roundedmd'
+                    >
+                      <h4 className='text-sm font-semibold'>{`Question ${index + 1}: ${question.questionText}`}</h4>
+                      <div className='mt-2'>
+                        <h2 className='text-xs'>Your Answer:</h2>
+                        <p className='text-xs'>{answer || 'No answer provided'}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+                <Button onClick={handleFinalSubmit}>Submit</Button>
+              </>
+            )}
+          </ScrollArea>
+        ) : (
+          <div className='bg-white px-6 rounded-lg flex-1'>
+            <h3 className=' font-semibold  text-base w-full justify-between inline-flex'>
+              {' '}
+              Item {currentQuestionIndex + 1}{' '}
+              <span className='text-sm italic font-normal'>
+                {questions[currentQuestionIndex]?.questionPoints} points
+              </span>
+            </h3>
+            <h4 className='mb-5 text-sm'> {questions[currentQuestionIndex]?.questionText}</h4>
+
+            {renderQuestionInput(questions[currentQuestionIndex])}
+
+            <div className='flex justify-between mt-4'>
+              <Button
+                onClick={handlePrev}
+                disabled={currentQuestionIndex === 0 || isSubmitted}
+              >
+                Prev
+              </Button>
+              <Button
+                onClick={currentQuestionIndex === questions.length - 1 ? handleSubmit : handleNext}
+                disabled={isSubmitted}
+              >
+                {currentQuestionIndex === questions.length - 1 ? 'Submit' : 'Next'}
+              </Button>
             </div>
           </div>
-          {/* 
-          {questions.map((question, index) => {
-            const answer = answers[question._id] || '';
-            return (
-              <div
-                key={question._id}
-                className='mb-4 border w-full p-2 roundedmd'
-              >
-                <h4 className='text-sm font-semibold'>{`Question ${index + 1}: ${question.questionText}`}</h4>
-                <div className='mt-2'>
-                  <h2 className='text-xs'>Your Answer:</h2>
-                  <p className='text-xs'>{answer || 'No answer provided'}</p>
-                </div>
-              </div>
-            );
-          })} */}
+        )}
 
-          <Button onClick={handleFinalSubmit}>Submit</Button>
-        </ScrollArea>
-      ) : (
-        <div className='bg-white px-6 rounded-lg flex-1'>
-          <h3 className=' font-semibold  text-base'> Item {currentQuestionIndex + 1} </h3>
-          <h4 className='mb-5 text-sm'> {questions[currentQuestionIndex]?.questionText}</h4>
+        {isSubmitted ? (
+          <div className=' w-1/4 '>
+            <div className='border rounded-md p-3 mt-4 flex flex-col gap-y-2'>
+              <h1 className='text-sm font-semibold uppercase'>{title} </h1>
 
-          {renderQuestionInput(questions[currentQuestionIndex])}
+              <h3 className='text-sm items-center inline-flex border-b pb-1.5'>
+                <KeyIcon className='h-4 text-green-600' />
+                Type {assessment.category}
+              </h3>
 
-          <div className='flex justify-between mt-4'>
-            <Button
-              onClick={handlePrev}
-              disabled={currentQuestionIndex === 0 || isSubmitted}
-            >
-              Prev
-            </Button>
-            <Button
-              onClick={currentQuestionIndex === questions.length - 1 ? handleSubmit : handleNext}
-              disabled={isSubmitted}
-            >
-              {currentQuestionIndex === questions.length - 1 ? 'Submit' : 'Next'}
-            </Button>
+              <h3 className='text-sm items-center inline-flex border-b pb-1.5 '>
+                <BarChartIcon className='h-4 text-[#5221DE]' />
+                Max Score {totalPoints}
+              </h3>
+
+              <h3 className='text-sm items-center inline-flex border-b pb-1.5 '>
+                <ClockIcon className='h-4 !text-[#DE5221]' />
+                Time Limit {assessment?.timeLimit ? assessment?.timeLimit + '  minutes' : 'No Time Limit'}
+              </h3>
+
+              <h3 className='text-sm items-center inline-flex  pb-1.5 '>
+                <CalendarIcon className='h-4 text-yellow-600' />
+                Due {formatDate.format(new Date(assessment?.assesmentDueDate))}
+              </h3>
+            </div>
+
+            <div className='border rounded-md p-3 mt-4 flex flex-col gap-y-2'>
+              <h1 className='text-sm'>Score</h1>
+              {submissions.length === 0 ? (
+                <p className='inline-flex items-center text-xs'>
+                  <XIcon className='h-4 text-red-600' /> Nothing submitted yet
+                </p>
+              ) : (
+                <p className='text-xs'>
+                  {lastItemScore} / {totalPoints}
+                </p>
+              )}
+            </div>
+
+            <div className='border rounded-md p-3 mt-4 flex flex-col gap-y-2 text-sm'>
+              <h1 className='text-sm'>Submissions</h1>
+
+              {submissions.length > 0 && (
+                <p>
+                  Submitted:{' '}
+                  {formatDate.format(
+                    new Date(submissions.length > 0 ? submissions[submissions.length - 1].submissionDate : null)
+                  )}
+                </p>
+              )}
+              <p>Attempts : {submissions.length}</p>
+              <p>Max Attempts : {assessment?.attempts}</p>
+              <p className='items-center inline-flex'>
+                Allow Late Submission :{' '}
+                {(assessment as AssesmentType)?.isLate ? (
+                  <CheckIcon className='h-4 text-green-600' />
+                ) : (
+                  <XIcon className='text-red-600 h-4' />
+                )}
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className='border w-1/4 rounded-md p-3 mt-4 flex flex-col gap-y-2 h-fit'>
+            {/* Assessment Header */}
+            <h1 className='text-sm font-semibold'>{title}</h1>
+            <h2 className='text-xs'>{assessment.description}</h2>
 
-      <div className='border w-1/4 rounded-md p-3 mt-4 flex flex-col gap-y-2 h-fit'>
-        {/* Assessment Header */}
-        <h1 className='text-sm font-semibold'>{title}</h1>
-        <h2 className='text-xs'>{assessment.description}</h2>
-
-        {/* Timer Display */}
-        <div className='mt-4'>
-          <strong>Time Left:</strong> {formatTime(timeLeft)}
-        </div>
+            {/* Timer Display */}
+            <div className='mt-4'>
+              <strong>Time Left:</strong> {formatTime(timeLeft)}
+            </div>
+          </div>
+        )}
       </div>
-    </div>
+    </main>
   );
 };
 

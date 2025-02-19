@@ -17,12 +17,12 @@ import {
 import { useFetchAndDispatch } from '@/helpers/useFetch';
 import Breadcrumb from '@/components/bread-crumb';
 import SectionCard from './section-card';
-import { getAllAssessment } from '@/api/assessment-api';
+import { getAllAssessment, getSubmisions } from '@/api/assessment-api';
 import ActivityCard from './activity-card';
 import { useAuth } from '@/stores/AuthContext';
 import PDFView from './single-views/view-pdf';
 import VideoView from './single-views/view-video';
-import { BarChartIcon, CalendarIcon, ClockIcon, KeyIcon } from 'lucide-react';
+import { BarChartIcon, CalendarIcon, CheckIcon, ClockIcon, KeyIcon, XIcon } from 'lucide-react';
 import Assessment from './single-views/view-activity';
 import { formatDate } from '../assesment/formatTime';
 
@@ -40,7 +40,7 @@ export const getRandomCover = (): string => {
 };
 
 const ViewModule = () => {
-  const { sections, modules, activity, courses, progress } = useCourse();
+  const { sections, modules, dispatch, activity, courses, progress, submissions } = useCourse();
   const [organizeSection, setOrganizeSection] = useState([]);
 
   const [module, setModule] = useState<ModuleTypes>({
@@ -99,8 +99,8 @@ const ViewModule = () => {
     { label: module.title, href: `/moduleId?=${module._id}`, isCurrentPage: true },
   ];
 
-  const [isInstruction, setIsInstructions] = useState(false);
-
+  const [isInstruction, setIsInstructions] = useState(true);
+  const lastItemScore = submissions.length > 0 ? submissions[submissions.length - 1].score : null;
   const renderItems = useCallback(() => {
     if (currentId && !currentId?.sectionType) {
       const activity: AssesmentType = currentId;
@@ -131,6 +131,25 @@ const ViewModule = () => {
               <>
                 <h2 className='text-xs'>{description}</h2>
 
+                {(currentId as AssesmentType)?.attempts > submissions.length && (
+                  <Button
+                    className='w-fit text-xs'
+                    onClick={() => {
+                      const params = new URLSearchParams(location.search);
+                      params.set('examId', currentId._id);
+                      const newUrl = `${location.pathname}?${params.toString()}`;
+
+                      navigate(newUrl);
+                    }}
+                  >
+                    Submit Answer
+                  </Button>
+                )}
+              </>
+            )}
+
+            {!isInstruction && submissions.length > 0 ? (
+              <>
                 <Button
                   className='w-fit text-xs'
                   onClick={() => {
@@ -141,10 +160,12 @@ const ViewModule = () => {
                     navigate(newUrl);
                   }}
                 >
-                  Submit Answer
+                  View Latest Submission
                 </Button>
               </>
-            )}
+            ) : !isInstruction ? (
+              <p>No submission found</p>
+            ) : null}
           </div>
           <div className='w-1/4 '>
             <div className='border rounded-md p-3 mt-4 flex flex-col gap-y-2'>
@@ -175,7 +196,39 @@ const ViewModule = () => {
             </div>
 
             <div className='border rounded-md p-3 mt-4 flex flex-col gap-y-2'>
+              <h1 className='text-sm'>Score</h1>
+              {submissions.length === 0 ? (
+                <p className='inline-flex items-center text-xs'>
+                  <XIcon className='h-4 text-red-600' /> Nothing submitted yet
+                </p>
+              ) : (
+                <p className='text-xs'>
+                  {lastItemScore} / {totalPoints}
+                </p>
+              )}
+            </div>
+
+            <div className='border rounded-md p-3 mt-4 flex flex-col gap-y-2 text-sm'>
               <h1 className='text-sm'>Submissions</h1>
+
+              {submissions.length > 0 && (
+                <p>
+                  Submitted:{' '}
+                  {formatDate.format(
+                    new Date(submissions.length > 0 ? submissions[submissions.length - 1].submissionDate : null)
+                  )}
+                </p>
+              )}
+              <p>Attempts : {submissions.length}</p>
+              <p>Max Attempts : {(currentId as AssesmentType)?.attempts}</p>
+              <p className='items-center inline-flex'>
+                Allow Late Submission :{' '}
+                {(currentId as AssesmentType)?.isLate ? (
+                  <CheckIcon className='h-4 text-green-600' />
+                ) : (
+                  <XIcon className='text-red-600 h-4' />
+                )}
+              </p>
             </div>
           </div>
         </section>
@@ -208,6 +261,17 @@ const ViewModule = () => {
 
       setCurrentId(nextItem);
       setCurrentIndex(currentIndex + 1);
+
+      const params = new URLSearchParams(location.search);
+
+      // Remove any existing 'current' parameters
+      params.delete('current');
+
+      // Set the new 'current' value
+      params.set('current', nextId);
+
+      // Navigate to the updated URL
+      navigate(`${location.pathname}?${params.toString()}`);
     }
   };
 
@@ -221,17 +285,70 @@ const ViewModule = () => {
         currentIndex === 0 || progress?.includes(organizeSection[currentIndex - 1]) || prevItem?.isUnlock;
 
       // if (isUnlocked || currentIndex === 1) {
+
       setCurrentId(prevItem);
+
       setCurrentIndex(currentIndex - 1);
+
+      const params = new URLSearchParams(location.search);
+
+      // Remove any existing 'current' parameters
+      params.delete('current');
+
+      // Set the new 'current' value
+      params.set('current', prevId);
+
+      // Navigate to the updated URL
+      navigate(`${location.pathname}?${params.toString()}`);
     }
   };
 
+  console.log(submissions);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getSubmisions(currentId._id);
+
+        console.log(data);
+        if (data.length > 0) {
+          setIsInstructions(false);
+        }
+        // Dispatch to both contexts
+        dispatch({ type: 'SET_SUBMISSION', payload: data });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    if (currentId && !currentId?.sectionType) {
+      fetchData();
+    }
+  }, [dispatch, currentId]);
+
+  const current = params.get('current');
+
+  useEffect(() => {
+    if (!current) {
+      setCurrentId(null);
+    }
+    if (current) {
+      const findSection: SectionTypes = sections.find((x) => x._id === current);
+      const findAssessment: AssesmentType = activity.find((x) => x._id === current);
+
+      if (findSection) {
+        setCurrentIndex(organizeSection.indexOf(findSection._id));
+        setCurrentId(findSection);
+      }
+
+      if (findAssessment) {
+        setCurrentIndex(organizeSection.indexOf(findAssessment._id));
+        setCurrentId(findAssessment);
+      }
+    }
+  }, [activity, current, organizeSection, sections]);
+
   if (examId) {
-    return (
-      <Container>
-        <Assessment assessmentProp={currentId} />
-      </Container>
-    );
+    return <Assessment assessmentProp={currentId} />;
   }
 
   return (
@@ -293,6 +410,11 @@ const ViewModule = () => {
                   key={findAssessment._id}
                   cardData={findAssessment}
                   isLocked={!isUnlocked}
+                  setCurrentId={() => {
+                    setCurrentId(findAssessment);
+                    setCurrentIndex(index);
+                    navigate(`${location.pathname}${location.search}&current=${findSection._id}`);
+                  }}
                 />
               );
             } else if (findSection) {
@@ -301,6 +423,7 @@ const ViewModule = () => {
                   setCurrentId={() => {
                     setCurrentId(findSection);
                     setCurrentIndex(index);
+                    navigate(`${location.pathname}${location.search}&current=${findSection._id}`);
                   }}
                   key={findSection._id}
                   isLocked={!isUnlocked}

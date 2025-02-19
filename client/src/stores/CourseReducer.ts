@@ -137,6 +137,12 @@ const CourseReducer = (state: any, action: { type: any; payload?: any }): any =>
       };
     }
 
+    case 'SET_SUBMISSION':
+      return {
+        ...state,
+        submissions: action.payload,
+      };
+
     default:
       return state;
   }

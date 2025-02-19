@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { createContext, useReducer, ReactNode, useContext } from 'react';
 import CourseReducer from './CourseReducer';
-import { AssesmentType, CourseTypes, ModuleTypes, ProgressType, SectionTypes } from '@/helpers/types';
+import { AssesmentType, CourseTypes, ModuleTypes, ProgressType, SectionTypes, SubmissionType } from '@/helpers/types';
 
 interface CourseState {
   courses: CourseTypes[];
@@ -9,6 +9,7 @@ interface CourseState {
   sections: SectionTypes[];
   activity: AssesmentType[];
   progress: ProgressType[];
+  submissions: SubmissionType[];
 }
 
 interface CourseContextType {
@@ -17,6 +18,7 @@ interface CourseContextType {
   sections: SectionTypes[];
   activity: AssesmentType[];
   progress: ProgressType[];
+  submissions: SubmissionType[];
   dispatch: React.Dispatch<any>;
 }
 
@@ -26,6 +28,7 @@ const INITIAL_STATE: CourseState = {
   sections: [],
   activity: [],
   progress: [],
+  submissions: [],
 };
 
 export const CourseContext = createContext<CourseContextType | undefined>(undefined);
@@ -41,6 +44,7 @@ export const CourseContextProvider: React.FC<{ children: ReactNode }> = ({ child
         modules: state.modules,
         sections: state.sections,
         activity: state.activity,
+        submissions: state.submissions,
         dispatch,
       }}
     >

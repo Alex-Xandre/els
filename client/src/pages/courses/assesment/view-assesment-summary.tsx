@@ -113,7 +113,7 @@ const PreviewAssessment: React.FC<PreviewAssesmentI> = ({ assesment, hadnleQuest
             <span className='font-semibold'>Total Points:</span> {totalPoints}
           </div>
           <div className='text-sm font-medium text-gray-700'>
-            <span className='font-semibold'>Due Date:</span> {assesment.assesmentDueDate.toLocaleDateString()}
+            <span className='font-semibold'>Due Date:</span> {new Date(assesment?.assesmentDueDate).toLocaleString()}
           </div>
           <div className='text-sm font-medium text-gray-700'>
             <span className='font-semibold'>Time Limit:</span> {assesment.timeLimit} minutes

@@ -64,11 +64,12 @@ const NewUser = () => {
       const searchParams = new URLSearchParams(item.search);
 
       const myParamValue = searchParams.get('');
+      console.log(myParamValue);
       if (!myParamValue) return;
       const items = allUser.find((x) => x._id === myParamValue) as UserTypes;
       if (!items) return;
 
-      setUserData({ ...items, personalData: items.personalData });
+      setUserData({ ...items, personalData: items.personalData ?? userData.personalData });
     }
   }, [allUser, item.search, state?.isEdit]);
 
@@ -117,12 +118,16 @@ const NewUser = () => {
 
   const { dispatch } = useAuth();
   const navigate = useNavigate();
+
   const handleSubmit = async () => {
     try {
-      console.log();
+      console.log(user);
       const res = await registerUserByAdmin({
         ...userData,
-        password: new Date(userData.personalData.birthday as string).toISOString().split('T')[0],
+        password:
+          user.password !== ''
+            ? user.password
+            : new Date(userData?.personalData?.birthday as string).toISOString().split('T')[0],
       });
 
       if (res.success === false) return toast.error(res.data?.msg || 'Error');
@@ -200,7 +205,7 @@ const NewUser = () => {
 
               {items.type === 'option' ? (
                 <SelectInput
-                  value={userData.personalData.sex}
+                  value={userData?.personalData?.sex}
                   onValueChange={(val) => {
                     setUserData((prev) => ({
                       ...prev,
@@ -221,7 +226,9 @@ const NewUser = () => {
                   className={`${items.type === 'file' && 'hidden'}`}
                   onChange={onInputChange}
                   value={
-                    items.type === 'file' ? undefined : (userData.personalData[items.name] as keyof UserTypes as string)
+                    items.type === 'file'
+                      ? undefined
+                      : (userData?.personalData?.[items?.name] as keyof UserTypes as string)
                   }
                 />
               )}
@@ -246,7 +253,7 @@ const NewUser = () => {
                 value={
                   items.type === 'file'
                     ? undefined
-                    : (userData.personalData.address[items.name] as keyof UserTypes as string)
+                    : (userData?.personalData?.address?.[items.name] as keyof UserTypes as string)
                 }
               />
             </div>

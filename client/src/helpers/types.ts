@@ -72,7 +72,7 @@ export interface ModuleTypes {
   _id: string;
   title: string;
   description: string;
-  courseId: string; // Reference to Course
+  courseId: string;
   createdAt?: Date;
   updatedAt?: Date;
   cover: '';
@@ -133,4 +133,14 @@ export interface SubmissionType {
   attempts: number;
   score: number;
   isGraded: number;
+}
+
+export interface TimelineActivityType {
+  user: string;
+  course: string;
+  module: string;
+  section?: string;
+  activity?: string;
+  activityType: 'viewed' | 'started' | 'completed' | 'submitted';
+  text?: string;
 }

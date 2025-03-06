@@ -17,6 +17,7 @@ import ViewSection from './pages/courses/sections/new-section';
 import NewAssesment from './pages/courses/assesment/new-assesment';
 import UserHome from './pages/user';
 import NewUser from './pages/user/new';
+import HomeStudent from './pages/dashboard/HomeStudent';
 
 const App = () => {
   const { isLoggedIn, user, dispatch } = useAuth();
@@ -52,18 +53,14 @@ const App = () => {
     { path: '/users/new', element: <NewUser /> },
   ];
 
-
-
-  
   const studentRoutes = [
-    { path: '/', element: <Home /> },
+    { path: '/', element: <HomeStudent /> },
     { path: '/courses', element: <CourseHome /> },
     { path: '/moduleId', element: <ViewCourse /> },
     { path: '/:moduleId/view', element: <ViewModule /> },
     { path: '/users', element: <UserHome /> },
   ];
 
-  
   const publicRoutes = [{ path: '/', element: <LoginLayout /> }];
 
   const renderRoutes = useCallback(() => {

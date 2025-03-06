@@ -259,7 +259,7 @@ const Assessment = ({ assessmentProp }) => {
   };
 
   useEffect(() => {
-    if (submissions.length >= assessment.attempts) {
+    if (submissions.length >= assessment.attempts || submissions.length > 0 ) {
       setIsSubmitted(true);
       setIsPreview(true);
 

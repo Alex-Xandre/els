@@ -3,6 +3,8 @@ import { updateProgress } from '@/api/course.api';
 import { SectionTypes } from '@/helpers/types';
 import { useAuth } from '@/stores/AuthContext';
 import { Play, Pause, Maximize, Minimize } from 'lucide-react';
+import { registerTimeline } from '@/api/get.info.api';
+import { createTimelineData } from '@/helpers/createTimelineData';
 
 interface PDFViewProps {
   currentId: SectionTypes;
@@ -35,6 +37,16 @@ const VideoView: React.FC<PDFViewProps> = ({ currentId }) => {
     if (videoRef.current) {
       const res = await updateProgress(user._id, currentId._id);
       dispatch({ type: 'UPDATE_PROGRESS', payload: res });
+      dispatch(
+        registerTimeline(
+          createTimelineData({
+            user: user._id,
+            section: currentId._id,
+            activityType: 'completed',
+            text: `Completed ${currentId.title}`,
+          })
+        )
+      );
     }
   };
 
@@ -95,7 +107,10 @@ const VideoView: React.FC<PDFViewProps> = ({ currentId }) => {
             onContextMenu={(e) => e.preventDefault()}
             className='w-full h-full  object-cover'
           >
-            <source src={currentId.resource} type='video/mp4' />
+            <source
+              src={currentId.resource}
+              type='video/mp4'
+            />
           </video>
 
           {/* Custom Controls */}
@@ -105,9 +120,15 @@ const VideoView: React.FC<PDFViewProps> = ({ currentId }) => {
               className='bg-gray-800 text-white px-3 py-2 rounded-full text-sm'
             >
               {videoRef.current && videoRef.current.paused ? (
-                <Play size={20}  className='h-4'/>
+                <Play
+                  size={20}
+                  className='h-4'
+                />
               ) : (
-                <Pause size={20} className='h-4' />
+                <Pause
+                  size={20}
+                  className='h-4'
+                />
               )}
             </button>
 
@@ -129,9 +150,15 @@ const VideoView: React.FC<PDFViewProps> = ({ currentId }) => {
               className='bg-gray-800 text-white px-4 py-2 rounded-full text-sm'
             >
               {isFullscreen ? (
-                <Minimize size={20}  className='h-4'/>
+                <Minimize
+                  size={20}
+                  className='h-4'
+                />
               ) : (
-                <Maximize size={20}  className='h-4'/>
+                <Maximize
+                  size={20}
+                  className='h-4'
+                />
               )}
             </button>
           </div>

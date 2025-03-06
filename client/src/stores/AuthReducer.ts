@@ -27,6 +27,7 @@ const AuthReducer = (state: any, action: { type: any; payload?: UserTypes & { to
         token: '',
         user: null,
       };
+
     case 'GET_ALL_USER':
       return {
         ...state,
@@ -48,6 +49,32 @@ const AuthReducer = (state: any, action: { type: any; payload?: UserTypes & { to
         return {
           ...state,
           allUser: [...state.allUser, userToAddOrUpdate],
+        };
+      }
+    }
+
+    case 'GET_ALL_TIMELINES':
+      return {
+        ...state,
+        allTimelines: action.payload,
+      };
+
+    case 'ADD_TIMELINE': {
+      const timelineToAddOrUpdate = action.payload;
+      const timelineIndex = state.allTimelines.findIndex((timeline: any) => timeline._id === timelineToAddOrUpdate._id);
+
+      if (timelineIndex >= 0) {
+        const updatedTimelines = state.allTimelines.map((timeline: any, index: number) =>
+          index === timelineIndex ? { ...timeline, ...timelineToAddOrUpdate } : timeline
+        );
+        return {
+          ...state,
+          allTimelines: updatedTimelines,
+        };
+      } else {
+        return {
+          ...state,
+          allTimelines: [timelineToAddOrUpdate,...state.allTimelines],
         };
       }
     }

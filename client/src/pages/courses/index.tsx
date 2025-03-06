@@ -11,11 +11,10 @@ import { getAllCourses, getAllModules } from '@/api/course.api';
 import Breadcrumb from '@/components/bread-crumb';
 import { useAuth } from '@/stores/AuthContext';
 const CourseHome = () => {
-  const { courses, modules} = useCourse();
+  const { courses, modules } = useCourse();
   const { user } = useAuth();
   useFetchAndDispatch(getAllCourses, 'SET_COURSES');
   useFetchAndDispatch(getAllModules, 'SET_MODULES');
- 
 
   const columns = [
     ...(user.role === 'admin' ? [{ header: 'ID', accessor: '_id' }] : []),
@@ -29,8 +28,6 @@ const CourseHome = () => {
     { label: 'Modules', isCurrentPage: true },
   ];
 
-  
-  
   const navigate = useNavigate();
   return (
     <Container>
@@ -42,12 +39,11 @@ const CourseHome = () => {
             {user.role === 'admin' && <Button onClick={() => navigate('new')}>Create Module</Button>}
           </NavContainer>
         }
-        data={courses.map((item) =>{
-          return{
+        data={courses.map((item) => {
+          return {
             ...item,
-            content: modules.filter((x) =>(x.courseId as any)?._id === item._id).length
-
-          }
+            content: modules.filter((x) => (x.courseId as any)?._id === item._id).length,
+          };
         })}
         columns={columns as any}
         caption='A list of your modules'

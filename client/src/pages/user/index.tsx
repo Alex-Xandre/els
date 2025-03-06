@@ -10,7 +10,7 @@ import { getAllUser } from '@/api/get.info.api';
 import { useAuth } from '@/stores/AuthContext';
 
 const UserHome = () => {
-  const { allUser } = useAuth();
+  const { allUser, user } = useAuth();
   useFetchAndDispatch(getAllUser, 'GET_ALL_USER');
 
   const columns = [
@@ -27,7 +27,6 @@ const UserHome = () => {
 
   const navigate = useNavigate();
 
-  console.log(allUser);
   return (
     <Container>
       <Breadcrumb items={breadcrumbItems} />
@@ -48,9 +47,10 @@ const UserHome = () => {
             };
           })}
         columns={columns as any}
- 
         onEdit={(item) => navigate(`/users/new?=${item?._id}`, { state: { isEdit: true } })}
-        onView={(item) => navigate(`/users/new?=${item?._id}/progress`, { state: { isEdit: true } })}
+        onView={(item) =>
+          navigate(`/users/new?=${item?._id}${user.role !== 'user' ? '' : '/progress'}`, { state: { isEdit: true } })
+        }
         title='Invoice'
       />
     </Container>

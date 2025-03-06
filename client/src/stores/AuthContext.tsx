@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { createContext, useReducer, ReactNode, useContext } from 'react';
 import AuthReducer from './AuthReducer';
-import { UserTypes } from '@/helpers/types';
+import { TimelineActivityType, UserTypes } from '@/helpers/types';
 
 interface AuthState {
   user: any;
   isLoggedIn: boolean;
   token: string;
   allUser: UserTypes[];
+  allTimelines: TimelineActivityType[];
 }
 
 interface AuthContextType {
@@ -15,6 +16,7 @@ interface AuthContextType {
   isLoggedIn: boolean;
   token: string;
   allUser: UserTypes[];
+  allTimelines: TimelineActivityType[];
   dispatch: React.Dispatch<any>;
 }
 
@@ -23,6 +25,7 @@ const INITITAL_STATE: AuthState = {
   isLoggedIn: false,
   token: '',
   allUser: [],
+  allTimelines: [],
 };
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,7 +40,7 @@ export const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ childre
         isLoggedIn: state.isLoggedIn,
         token: state.token,
         allUser: state.allUser,
-
+        allTimelines: state.allTimelines,
         dispatch,
       }}
     >

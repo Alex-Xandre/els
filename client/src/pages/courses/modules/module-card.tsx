@@ -8,6 +8,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { getRandomCover } from '../sections/view-section';
+import { registerTimeline } from '@/api/get.info.api';
+import { createTimelineData } from '@/helpers/createTimelineData';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -24,7 +27,10 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
 
   const studentProgress = progress.find((item) => item.studentId === user._id);
 
-  const completedLessons = studentProgress?.completedLessons?.length || 0;
+  const completedLessons =
+    studentProgress?.completedLessons?.filter((lessonId) =>
+      [...sections, ...activity].some((item) => item._id === lessonId && item.moduleId?._id === module._id)
+    ).length || 0;
 
   const totalSections = sections.filter((x) => x.moduleId?._id === module._id).length;
   const totalActivities = activity.filter((x) => x.moduleId?._id === module._id).length;
@@ -56,12 +62,21 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
     },
   };
 
-  console.log(progress);
+  const { dispatch } = useAuth();
   return (
     <div
-      className='bg-white mr-3 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300'
+      className='bg-white w-72 mr-3 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300'
       onClick={() => {
         if (user.role === 'user') {
+          dispatch(
+            registerTimeline(
+              createTimelineData({
+                user: user._id,
+                module: module._id,
+                text: `Viewed ${module.title}`,
+              })
+            )
+          );
           navigate(`/${module?.courseId?._id}/view?=${module._id}`);
         }
       }}
@@ -69,7 +84,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
       {/* Cover Image */}
       <div className='w-full h-48 overflow-hidden'>
         <img
-          src={module.cover || 'https://via.placeholder.com/400x200'}
+          src={module.cover !== '' ? module.cover : getRandomCover()}
           alt={module.title}
           className='w-full h-full object-cover'
         />
@@ -107,7 +122,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
           <div>
             {sections.filter((x) => x.moduleId?._id === module._id).length > 0 && (
               <span className='inline-flex items-center text-green-900 text-xs'>
-                {sections.length}
+                {sections.filter((x) => x.moduleId?._id === module._id).length}
                 <FolderIcon className='h-3' />
               </span>
             )}
@@ -120,18 +135,17 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
               </span>
             )}
           </div>
-          { user.role === "user" && sections.filter((x) => x.moduleId?._id === module._id).length > 0 &&
-            activity.filter((x) => x.moduleId?._id === module._id).length > 0 && (
-              <div className='inline-flex items-center gap-x-3'>
-                <p className='text-xs '>{completionPercentage.toFixed(2)} % </p>
-                <div className='relative h-6 w-6 inline-flex self-end items-center gap-x-2'>
-                  <Doughnut
-                    data={chartData}
-                    options={chartOptions}
-                  />
-                </div>
+          {user.role === 'user' && sections.filter((x) => x.moduleId?._id === module._id).length > 0 && (
+            <div className='inline-flex items-center gap-x-3'>
+              <p className='text-xs '>{completionPercentage.toFixed(2)} % </p>
+              <div className='relative h-6 w-6 inline-flex self-end items-center gap-x-2'>
+                <Doughnut
+                  data={chartData}
+                  options={chartOptions}
+                />
               </div>
-            )}
+            </div>
+          )}
         </div>
       </div>
     </div>

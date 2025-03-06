@@ -57,6 +57,7 @@ const NewAssesment = () => {
     if (myParamValue) {
       const items = activity.find((item) => item._id === myParamValue);
 
+      console.log(items)
       if (!items) return;
 
       setAssesment({ ...items,
@@ -168,6 +169,8 @@ const NewAssesment = () => {
       navigate(-1);
     }
   };
+
+
   return (
     <Container>
       <header className='inline-flex w-full justify-between pr-3'>

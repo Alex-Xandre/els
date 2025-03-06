@@ -151,7 +151,7 @@ const ViewModule = () => {
             {!isInstruction && submissions.length > 0 ? (
               <>
                 <Button
-                  className='w-fit text-xs'
+                  className='w-fit text-xs mt-2'
                   onClick={() => {
                     const params = new URLSearchParams(location.search);
                     params.set('examId', currentId._id);

@@ -3,7 +3,7 @@ import { useSidebar } from './ui/sidebar';
 
 const Container = ({ children }: { children: ReactNode }) => {
   const { open } = useSidebar();
-  return <main className={`  ${!open ? 'ml-16' : 'ml-72'} flex flex-wrap mt-20 pr-5`}>{children}</main>;
+  return <main className={`  ${!open ? 'ml-16' : 'ml-72'}  relative content-start flex flex-wrap mt-20 pr-5 overflow-y-auto h-[calc(100vh-100px)]`}>{children}</main>;
 };
 
 export default Container;

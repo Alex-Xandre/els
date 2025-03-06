@@ -6,6 +6,9 @@ import { EyeIcon, LockIcon, UnlockIcon } from 'lucide-react';
 import React from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { getRandomCover } from './view-section';
+import { registerTimeline } from '@/api/get.info.api';
+import { createTimelineData } from '@/helpers/createTimelineData';
 
 const SectionCard = ({
   cardData,
@@ -43,12 +46,21 @@ const SectionCard = ({
     `}
       onClick={() => {
         if (user.role === 'user' && setCurrentId && !isLocked) {
+          dispatch(
+            registerTimeline(
+              createTimelineData({
+                user: user._id,
+                section: cardData._id,
+                text: `Viewed ${cardData.title}`,
+              })
+            )
+          );
           setCurrentId();
         }
       }}
     >
       <img
-        src={cover}
+        src={cover !== '' ? cover : getRandomCover()}
         className='h-24 w-24'
       />
       <div className=' w-full lg:max-w-1/3 m-0  p-4 overflow-ellipsis  '>

@@ -1,4 +1,6 @@
 import { updateProgress } from '@/api/course.api';
+import { registerTimeline } from '@/api/get.info.api';
+import { createTimelineData } from '@/helpers/createTimelineData';
 import { SectionTypes } from '@/helpers/types';
 import { useAuth } from '@/stores/AuthContext';
 
@@ -22,6 +24,16 @@ const PDFView: React.FC<PDFViewProps> = ({ currentId }) => {
             const res = await updateProgress(user._id, currentId._id);
 
             dispatch({ type: 'UPDATE_PROGRESS', payload: res });
+            dispatch(
+              registerTimeline(
+                createTimelineData({
+                  user: user._id,
+                  section: currentId._id,
+                  activityType: 'completed',
+                  text: `Completed ${currentId.title}`,
+                })
+              )
+            );
           }}
         >
           {currentId?.title}

@@ -101,29 +101,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             },
           ]
         : []),
-      {
-        title: 'Settings',
-        url: '/settings',
-        icon: Settings2,
-        items: [
-          {
-            title: 'General',
-            url: '#',
-          },
-          {
-            title: 'Team',
-            url: '#',
-          },
-          {
-            title: 'Billing',
-            url: '#',
-          },
-          {
-            title: 'Limits',
-            url: '#',
-          },
-        ],
-      },
     ],
     projects: [
       {
@@ -149,7 +126,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       collapsible='icon'
       {...props}
     >
-      <nav className=' border-b absolute top-0 z-50 h-12 w-screen justify-between inline-flex'>
+      <nav className=' border-b absolute top-0 z-50 h-12 w-screen justify-between inline-flex bg-blue-500'>
         <button
           onClick={toggleSidebar}
           className=' bg-white  p-1.5 m-1.5 cursor-pointer   shadow-sm rounded-sm w-fit'

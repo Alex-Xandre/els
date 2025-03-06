@@ -43,11 +43,9 @@ const LoginLayout = () => {
 
   return (
     <main className='w-full h-screen flex'>
-      <section className='w-1/2 flex justify-center items-center '>
-        {/* You can place additional content on this side, like an image or a logo */}
-      </section>
-      <section className='w-1/2 p-6 bg-muted shadow-lg rounded-lg flex justify-center items-center'>
-        <div className='w-2/3  p-5   shadow-md rounded-lg bg-white'>
+     
+      <section className=' w-full p-6 bg-muted shadow-lg rounded-lg flex justify-center items-center'>
+        <div className='w-1/3 space-y-3  p-5   shadow-md rounded-lg bg-white'>
           <h1 className='text-xl  font-semibold'>Login Account</h1>
           <p className='text-sm mb-5'>Enter your ID and password below to login to your account</p>
           <div className='space-y-4'>

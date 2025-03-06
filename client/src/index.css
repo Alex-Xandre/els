@@ -139,3 +139,26 @@
   }
 }
 
+
+
+@layer utilities {
+  @responsive {
+    .masonry {
+      column-gap: 1.5em;
+      column-count: 1;
+    }
+    .masonry-sm {
+      column-gap: 1.5em;
+      column-count: 2;
+    }
+    .masonry-md {
+      column-gap: 1em;
+      column-count: 4;
+    }
+    .break-inside-avoid {
+      break-inside: avoid;
+    }
+  }
+}
+
+

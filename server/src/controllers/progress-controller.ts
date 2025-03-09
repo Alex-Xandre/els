@@ -36,20 +36,17 @@ export const updateProgress = expressAsyncHandler(async (req: any, res: any) => 
 
 // Get Student Progress
 export const getStudentProgress = expressAsyncHandler(async (req: any, res: any) => {
-  const { studentId } = req.params;
+  const isAdmin = req.user.role === 'admin';
+  const query = isAdmin ? {} : { studentId: req.params.studentId };
 
   try {
-    const progress = await Progress.findOne({ studentId });
-
-    if (!progress) {
-      return res.status(200).json([]);
-    }
-
-    res.status(200).json([progress]);
+    const progress = await Progress.find(query);
+    res.status(200).json(progress);
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
 });
+
 
 // Check if Lesson is Unlocked
 export const checkLessonUnlock = expressAsyncHandler(async (req: any, res: any) => {

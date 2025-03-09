@@ -51,7 +51,7 @@ const UserHome = () => {
         onView={(item) =>
           navigate(`/users/new?=${item?._id}${user.role !== 'user' ? '' : '/progress'}`, { state: { isEdit: true } })
         }
-        title='Invoice'
+        title='Users'
       />
     </Container>
   );

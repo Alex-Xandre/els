@@ -253,7 +253,7 @@ const Assessment = ({ assessmentProp }) => {
       submissionDate: new Date(),
       attempts: 1,
       score: totalScore,
-      isGraded: 0,
+      isGraded: false,
     });
     navigate(-1);
   };

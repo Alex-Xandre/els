@@ -64,7 +64,7 @@ const NewUser = () => {
       const searchParams = new URLSearchParams(item.search);
 
       const myParamValue = searchParams.get('');
-      console.log(myParamValue);
+
       if (!myParamValue) return;
       const items = allUser.find((x) => x._id === myParamValue) as UserTypes;
       if (!items) return;
@@ -121,12 +121,12 @@ const NewUser = () => {
 
   const handleSubmit = async () => {
     try {
-      console.log(user);
+
       const res = await registerUserByAdmin({
         ...userData,
         password:
-          user.password !== ''
-            ? user.password
+        userData.password !== ''
+            ? userData.password
             : new Date(userData?.personalData?.birthday as string).toISOString().split('T')[0],
       });
 

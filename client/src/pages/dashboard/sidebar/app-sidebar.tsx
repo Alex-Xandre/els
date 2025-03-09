@@ -9,6 +9,7 @@ import {
   Map,
   PanelLeft,
   PieChart,
+  RefreshCcw,
   Settings2,
   UserIcon,
   XIcon,
@@ -53,23 +54,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       email: 'm@example.com',
       avatar: '/avatars/shadcn.jpg',
     },
-    teams: [
-      {
-        name: 'Acme Inc',
-        logo: GalleryVerticalEnd,
-        plan: 'Enterprise',
-      },
-      {
-        name: 'Acme Corp.',
-        logo: AudioWaveform,
-        plan: 'Startup',
-      },
-      {
-        name: 'Evil Corp.',
-        logo: Command,
-        plan: 'Free',
-      },
-    ],
+
     navMain: [
       {
         title: 'Home',
@@ -91,6 +76,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           };
         }),
       },
+
+      ...(user.role === 'admin'
+        ? [
+            {
+              title: 'Progress',
+              url: '/progress',
+              icon: RefreshCcw,
+              isDropdown: true,
+            },
+          ]
+        : []),
       ...(user.role === 'admin'
         ? [
             {
@@ -101,23 +97,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             },
           ]
         : []),
-    ],
-    projects: [
-      {
-        name: 'Design Engineering',
-        url: '#',
-        icon: Frame,
-      },
-      {
-        name: 'Sales & Marketing',
-        url: '#',
-        icon: PieChart,
-      },
-      {
-        name: 'Travel',
-        url: '#',
-        icon: Map,
-      },
     ],
   };
 

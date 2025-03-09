@@ -132,7 +132,7 @@ export interface SubmissionType {
   submissionDate: Date;
   attempts: number;
   score: number;
-  isGraded: number;
+  isGraded: boolean;
 }
 
 export interface TimelineActivityType {

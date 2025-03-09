@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { Eye, Play, CheckCircle, Send } from 'lucide-react';
 import { TimelineActivityType } from '@/helpers/types';
 import { useCourse } from '@/stores/CourseContext';
+import { useAuth } from '@/stores/AuthContext';
 
 // Function to get relative time (e.g., "2 hours ago")
 const getTimeAgo = (timestamp: string): string => {
@@ -28,7 +29,7 @@ const getTimeAgo = (timestamp: string): string => {
 };
 
 // Activity styles with icons and colors
-const activityStyles: Record<TimelineActivityType['activityType'], { icon: JSX.Element; color: string }> = {
+export const activityStyles: Record<TimelineActivityType['activityType'], { icon: JSX.Element; color: string }> = {
   viewed: { icon: <Eye className='text-blue-500 h-4' />, color: 'border-blue-500 text-blue-500' },
   started: { icon: <Play className='text-yellow-500 h-4' />, color: 'border-yellow-500 text-yellow-500' },
   completed: { icon: <CheckCircle className='text-green-500 h-4' />, color: 'border-green-500 text-green-500' },
@@ -58,17 +59,32 @@ const TimelineCard: FC<{ data: TimelineActivityType }> = ({ data }) => {
   ]
     .filter(Boolean)
     .join(' | ');
+  const { allUser, user } = useAuth();
   const [firstWord, ...restWords] = data.text.split(' ');
+  const findUser = allUser.find((x) => x._id === data.user);
   return (
-    <div className={`border-r-4 ${color} shadow-sm m-1 w-full p-4 bg-white`}>
-      <div className='flex items-center space-x-3'>
-        {icon}
-        <div>
-          <p className='font-semibold text-sm text-black'>
-            <span className={`${color}`}>{firstWord}</span> {restWords.join(' ')}
-          </p>
-          <p className='text-xs !text-black'>{displayText}</p>
-          <p className='text-sm !text-gray-500 text-xs'>{getTimeAgo((data as any)?.createdAt)}</p>
+    <div className={` m-1 w-full  bg-white`}>
+      <div className='inline-flex w-full justify-between mt-1'>
+        <span className='inline-flex items-center text-sm gap-x-2'>
+          <img
+            src={user.role === 'user' ? user.profile : findUser.profile}
+            className='h-6 w-6 m-0'
+          />
+          {user.role === 'user' ? 'You' : `${findUser?.personalData?.firstName} ${findUser?.personalData?.lastName}`}
+        </span>
+        <p className=' !text-gray-500 text-xs'>{getTimeAgo((data as any)?.createdAt)}</p>
+      </div>
+      <div className={`flex items-center space-x-3 bg-white  border p-3 rounded-2xl mt-1 relative`}>
+        <div className={`border-l-4 ${color} pl-3 `}>
+          <div>
+            <p className='font-semibold text-sm text-black inline-flex'>
+              <div className='w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-sm'>
+                {icon}
+              </div>
+              <span className={`${color}`}>{firstWord}</span> <span className='ml-2 font-normal'>{restWords.join(' ')}</span>
+            </p>
+            <p className='text-xs !text-black'>{displayText}</p>
+          </div>
         </div>
       </div>
     </div>

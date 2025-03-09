@@ -120,10 +120,9 @@ export const newSubmission = expressAsyncHandler(async (req: any, res: any) => {
   }
 });
 export const getSubmissions = async (req: CustomRequest, res) => {
-  const assessment = await Submissions.find({ activityId: req.params.id });
+  const isAdmin = req.user.role === 'admin';
+  const query = isAdmin ? {} : { activityId: req.params.id, user: req.user._id };
 
-  const filteredAssessment =
-    req.user.role === 'admin' ? assessment : assessment.filter((x) => x.user.toString() === req.user._id.toString());
-
-  res.status(200).json(filteredAssessment);
+  const submissions = await Submissions.find(query);
+  res.status(200).json(submissions);
 };

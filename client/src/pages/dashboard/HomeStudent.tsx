@@ -9,9 +9,9 @@ import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { getRandomCover } from '../courses/sections/view-section';
 import { useNavigate } from 'react-router-dom';
-import CourseCard from './CourseCard';
+import CourseCard from './course-card';
 import { getAllTimeline } from '@/api/get.info.api';
-import TimelineCard from './TimelineCard';
+import TimelineCard, { activityStyles } from './TimelineCard';
 import { LeftCalendar } from './LeftCalendar';
 
 const HomeStudent = () => {
@@ -25,8 +25,7 @@ const HomeStudent = () => {
   useFetchAndDispatch(getAllTimeline, 'GET_ALL_TIMELINES');
   useFetchAndDispatch(getStudentProgress, 'SET_PROGRESS', user._id);
 
-  console.log(allTimelines);
-
+  
   const studentProgress = progress.find((item) => item.studentId === user._id);
 
   const completedLessons = studentProgress?.completedLessons?.length || 0;
@@ -55,17 +54,21 @@ const HomeStudent = () => {
       legend: {
         display: false,
       },
+      tooltip: {
+        enabled: false, // Disables tooltips on hover
+      },
+    },
+    hover: {
+      mode: null, // Disables hover interactions
     },
   };
-
-  console.log(allTimelines);
 
   return (
     <Container>
       <nav className='inline-flex items-center justify-between w-full pr-4 '>
         <div className='m-0'>
-          <h1> 👋 Hi there, {user?.personalData?.firstName} </h1>
-          <h2 className='text-xs'>Here is the summary of your activity</h2>
+          <h1 className='text-2xl'> 👋 Hi there, {user?.personalData?.firstName} </h1>
+          <h2 className='text-xs ml-10'>Here is the summary of your activity</h2>
         </div>
 
         <div className='flex items-center space-x-2'>
@@ -152,38 +155,25 @@ const HomeStudent = () => {
           </div>
         </div>
 
-        <div className='relative flex flex-col h-1/2 w-full mr-72 mt-5 '>
-          <h1 className='text-sm font-semibold w-full mb-5'>My Activities </h1>
-          {allTimelines.map((x, index) => (
-            <div
-              key={index}
-              className='relative flex w-full '
-            >
-              <img
-                src={user.profile}
-                className='h-8 w-8'
-              />
-              {/* Vertical Thread Line */}
-              <div className='flex flex-col items-center w-10 relative'>
-                {/* Top Connecting Line (if not the first item) */}
-                {index !== 0 && <div className='w-1 bg-sky-100 flex-grow min-h-[20px]'></div>}
+        <div className='relative flex flex-col h-1/2 w-full mr-72 mt-5'>
+          <h1 className='text-sm font-semibold w-full mb-5'>My Activities</h1>
+          {allTimelines.map((x, index) => {
+            const { icon } = activityStyles[x.activityType];
 
-                {/* Thread Node (Circle) */}
-                <div className='w-3 h-3 bg-sky-100 rounded-full relative'>
-                  {/* Horizontal Line (Attached to Circle) */}
-                  <div className='absolute left-full top-1/2 transform -translate-y-1/2 w-6 h-1 bg-sky-100'></div>
+            return (
+              <div
+                key={index}
+                className='relative flex w-full'
+              >
+                {/* Timeline Container (Fix for Start-Aligned Circles & Centered Line) */}
+
+                {/* Content (Aligned with Start of Circle) */}
+                <div className='flex items-start space-x-4 w-full'>
+                  <TimelineCard data={x} />
                 </div>
-
-                {/* Bottom Connecting Line (if not the last item) */}
-                {index !== allTimelines.length - 1 && <div className='w-1 bg-sky-100 flex-grow min-h-[40px]'></div>}
               </div>
-
-              {/* Content */}
-              <div className='flex items-center space-x-4 w-full'>
-                <TimelineCard data={x} />
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
     </Container>

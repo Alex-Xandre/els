@@ -74,17 +74,22 @@ const ReusableTable = <T,>({
                   return (
                     <TableCell
                       key={columnIndex}
-                      className={`${
-                        (((row as any)?.profile && column.accessor === 'name') || column.accessor === 'status') &&
-                        'inline-flex items-center gap-x-3'
-                      }
-                      
-                   
+                      className={`
+                        ${
+                          (((row as any)?.profile && column.accessor === 'name') || column.accessor === 'status') &&
+                     
+                          'inline-flex items-center gap-x-3 !mt-3'
+                        }
+
+                           ${
+                             (((row as any)?.profile && column.accessor === 'name') || column.accessor === 'status') && title ==="Users"&& 
+                             'inline-flex items-center gap-x-3 !mt-0'
+                           }
                       `}
                     >
-                      {row.status === 'Online' && column.accessor === 'status' ? (
+                      {(row as any)?.status === 'Online' && column.accessor === 'status' ? (
                         <p className='h-2 w-2 rounded-full bg-green-500' />
-                      ) : row.status === 'Offline' && column.accessor === 'status' ? (
+                      ) : (row as any)?.status === 'Offline' && column.accessor === 'status' ? (
                         <p className='h-2 w-2 rounded-full bg-red-500' />
                       ) : (
                         ''
@@ -103,22 +108,22 @@ const ReusableTable = <T,>({
                     </TableCell>
                   );
                 })}
-                {onEdit  && (
+                {onEdit && (
                   <TableCell>
-                   
-                   {user.role ==="admmin"&& <button
-                      onClick={() => onEdit(row)}
-                      className='text-green-500 mr-5'
-                    >
-                      {title === 'Applicant'
-                        ? 'View Application'
-                        : title === 'Requirement' || title === 'sk' || title === 'kk'
-                        ? 'View'
-                        : 'Edit'}
-                    </button>
-}
+                    {user.role === 'admmin' && (
+                      <button
+                        onClick={() => onEdit(row)}
+                        className='text-green-500 mr-5'
+                      >
+                        {title === 'Applicant'
+                          ? 'View Application'
+                          : title === 'Requirement' || title === 'sk' || title === 'kk'
+                          ? 'View'
+                          : 'Edit'}
+                      </button>
+                    )}
 
-                    {onView  && (
+                    {onView && (
                       <button
                         onClick={() => onView(row)}
                         className=' mr-5'

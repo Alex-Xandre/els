@@ -31,7 +31,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
 
   return (
     <div
-      className='flex-1 rounded-md border overflow-hidden cursor-pointer'
+      className='flex-1 rounded-md border overflow-hidden cursor-pointer bg-sky-50'
       key={course._id}
       onClick={() => {
         dispatch(
@@ -53,15 +53,22 @@ const CourseCard: React.FC<CourseCardProps> = ({
           className='w-full h-full object-cover'
         />
       </div>
-      <h1 className='p-2 font-semibold text-sm'>{course.title}</h1>
-      <span className='inline-flex p-2 items-center text-green-900 text-xs'>
-        {sectionCount} Sections
-        <FolderIcon className='h-3' />
-      </span>
-      <p className='text-xs text-gray-600 px-2 pb-2 '>
-        {completedLessons} of {totalSections + totalActivities} Completed
-        <span> {completedLessons === 0 ? '❌' : '✔️'} </span>
-      </p>
+
+      <div className='p-2'>
+        <div className='border-l-2 border-x-blue-600'>
+          <h1 className='p-2 font-semibold text-sm'>{course.title}</h1>
+          <span className='inline-flex p-2 items-center text-green-900 text-xs font-medium'>
+            {sectionCount} Sections
+            <FolderIcon className='h-3' />
+          </span>
+          {user.role === 'user' && (
+            <p className='text-xs text-gray-600 px-2 pb-2 '>
+              {completedLessons} of {totalSections + totalActivities} Completed
+              <span> {completedLessons === 0 ? '❌' : '✔️'} </span>
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

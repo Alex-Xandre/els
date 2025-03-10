@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { AssesmentType, SubmissionType } from '@/helpers/types';
 import { useFetchAndDispatch } from '@/helpers/useFetch';
 import { useCourse } from '@/stores/CourseContext';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/stores/AuthContext';
@@ -29,14 +29,13 @@ const Assessment = ({ assessmentProp }) => {
     }
   );
 
-  const [submissionData, setSubmissionData] = useState<undefined | SubmissionType>(undefined);
-
   const location = useLocation();
   const params = new URLSearchParams(location.search);
 
   const examId = params.get('examId');
   const { activity, submissions } = useCourse();
 
+  const subId = params.get('');
   useFetchAndDispatch(getAllAssessment, 'SET_ACTIVITY');
 
   useEffect(() => {
@@ -100,19 +99,23 @@ const Assessment = ({ assessmentProp }) => {
   const { user } = useAuth();
 
   const handleFinalSubmit = async () => {
+    const totalScoreChecked: any = Object.values(scores).reduce((sum: any, score: any) => sum + score, 0);
+
     const res = await createSubmission({
-      user: user._id,
+      _id: subId || '',
+      ...(user.role === 'user' && { user: user._id }),
       activityId: examId,
       answers: answers,
       submissionDate: new Date(),
       attempts: 1,
-      score: totalScore,
-      isGraded: 0,
+      ...(user.role === 'admin' && { scores:scores }),
+      score: user.role === 'admin' ? totalScoreChecked : totalScore,
+      isGraded: user.role === 'admin' ? true : false,
     });
-    console.log(res);
 
     setIsSubmitted(true);
 
+    navigate(-1)
     // Handle actual submission logic here
   };
 
@@ -210,42 +213,46 @@ const Assessment = ({ assessmentProp }) => {
 
   const { open } = useSidebar();
 
-  useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      const message = 'Are you sure you want to leave? Your progress may be lost and this will be submitted!';
-      event.preventDefault();
-      event.returnValue = message;
-      return message;
-    };
+  // useEffect(() => {
+  //   const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+  //     const message = 'Are you sure you want to leave? Your progress may be lost and this will be submitted!';
+  //     event.preventDefault();
+  //     event.returnValue = message;
+  //     return message;
+  //   };
 
-    const handlePopState = () => {
-      if (window.confirm('Are you sure you want to leave? Your progress may be lost and this will be submitted!')) {
-        handleUserConfirmedExit();
-        return;
-      } else {
-        // Push state again to prevent back navigation
-        // window.history.pushState(null, '', window.location.href);
-      }
-    };
+  //   const handlePopState = () => {
+  //     if (window.confirm('Are you sure you want to leave? Your progress may be lost and this will be submitted!')) {
+  //       handleUserConfirmedExit();
+  //       return;
+  //     } else {
+  //       // Push state again to prevent back navigation
+  //       // window.history.pushState(null, '', window.location.href);
+  //     }
+  //   };
 
-    if ( assessment.attempts > submissions.length) {
-      // Push initial state to prevent immediate back navigation
-      window.history.pushState(null, '', window.location.href);
+  //   if (assessment.attempts > submissions.length) {
+  //     // Push initial state to prevent immediate back navigation
+  //     window.history.pushState(null, '', window.location.href);
 
-      window.addEventListener('beforeunload', handleBeforeUnload);
-      window.addEventListener('popstate', handlePopState);
-    }
+  //     window.addEventListener('beforeunload', handleBeforeUnload);
+  //     window.addEventListener('popstate', handlePopState);
+  //   }
 
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      window.removeEventListener('popstate', handlePopState);
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener('beforeunload', handleBeforeUnload);
+  //     window.removeEventListener('popstate', handlePopState);
+  //   };
+  // }, []);
 
   const navigate = useNavigate();
 
   // External function to handle user confirmation
   const handleUserConfirmedExit = async () => {
+    if (user.role === 'admin') {
+      navigate(-1);
+      return;
+    }
     const res = await createSubmission({
       user: user._id,
       activityId: examId,
@@ -253,19 +260,48 @@ const Assessment = ({ assessmentProp }) => {
       submissionDate: new Date(),
       attempts: 1,
       score: totalScore,
+    
       isGraded: false,
     });
     navigate(-1);
   };
 
   useEffect(() => {
-    if (submissions.length >= assessment.attempts || submissions.length > 0 ) {
+    if (submissions.length >= assessment.attempts || submissions.length > 0) {
       setIsSubmitted(true);
       setIsPreview(true);
 
       setAnswers(submissions[submissions.length - 1].answers);
+      if (submissions[submissions.length - 1]?.scores) {
+        setScores(submissions[submissions.length - 1]?.scores);
+      } else {
+        if (assessment?.questions?.length) {
+          setScores(
+            assessment.questions.reduce((acc, question) => {
+              const userAnswer = answers[question._id];
+              acc[question._id] =
+                userAnswer === question.correctAnswer && question.questionType !== 'essay'
+                  ? question.questionPoints
+                  : 0;
+              return acc;
+            }, {})
+          );
+        }
+      }
     }
-  }, []);
+  }, [assessment]);
+
+  const [scores, setScores] = useState({});
+
+  // Function to update scores manually
+  const handleScoreChange = (questionId, newScore) => {
+    setScores((prevScores) => ({
+      ...prevScores,
+      [questionId]: Number(newScore), // Ensure numeric value
+    }));
+  };
+
+  
 
   return (
     <main className={`  ${!open ? 'pl-16' : 'pl-72'} inset-0 z-50  absolute flex flex-wrap mt-20 pr-5`}>
@@ -309,20 +345,37 @@ const Assessment = ({ assessmentProp }) => {
                             </p>
 
                             <div className='flex items-center gap-2 mt-2'>
-                              <span className='text-xs font-semibold'>{isCorrect ? '✔️ Correct' : '❌ Wrong'}</span>
+                              <span className='text-xs font-semibold'>
+                                {isCorrect ? `✔️ Correct ` : '❌ Wrong'}
+                                <span className='font-normal'>
+                                  {isCorrect ? ` -  ${question.questionPoints} points` : ''}
+                                </span>
+                              </span>
                             </div>
                           </>
                         )}
 
-                        {isEssay && (
-                          <div className='flex items-center gap-2 mt-2'>
-                            <span className='text-xs font-semibold'>-</span>
+                        {(isEssay || question.questionType === 'enumeration') && (
+                          <div className='flex flex-col w-1/2 gap-2 mt-2'>
+                            <span className='text-xs font-semibold m-0'>
+                              {scores?.[question._id]} - Max Score {question.questionPoints}
+                            </span>
+
+                            {user.role === 'admin' && (
+                              <Input
+                                placeholder='Add Score'
+                                value={scores?.[question._id] || ''}
+                                onChange={(e) => handleScoreChange(question._id, e.target.value)}
+                              />
+                            )}
                           </div>
                         )}
                       </div>
                     </div>
                   );
                 })}
+
+                {user.role === 'admin' && <Button onClick={handleFinalSubmit}>Submit Grading</Button>}
               </div>
             )}
 

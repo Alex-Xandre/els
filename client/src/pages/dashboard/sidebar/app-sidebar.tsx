@@ -80,7 +80,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       ...(user.role === 'admin'
         ? [
             {
-              title: 'Progress',
+              title: 'Scores',
               url: '/progress',
               icon: RefreshCcw,
               isDropdown: true,

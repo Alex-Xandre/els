@@ -9,7 +9,7 @@ interface PDFViewProps {
 }
 
 const PDFView: React.FC<PDFViewProps> = ({ currentId }) => {
-  console.log(currentId);
+
   const { user, dispatch } = useAuth();
   return (
     <div className='mt-3 flex flex-col'>

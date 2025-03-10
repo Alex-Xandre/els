@@ -77,12 +77,12 @@ const ReusableTable = <T,>({
                       className={`
                         ${
                           (((row as any)?.profile && column.accessor === 'name') || column.accessor === 'status') &&
-                     
                           'inline-flex items-center gap-x-3 !mt-3'
                         }
 
                            ${
-                             (((row as any)?.profile && column.accessor === 'name') || column.accessor === 'status') && title ==="Users"&& 
+                             (((row as any)?.profile && column.accessor === 'name') || column.accessor === 'status') &&
+                             title === 'Users' &&
                              'inline-flex items-center gap-x-3 !mt-0'
                            }
                       `}
@@ -110,16 +110,12 @@ const ReusableTable = <T,>({
                 })}
                 {onEdit && (
                   <TableCell>
-                    {user.role === 'admmin' && (
+                    {user.role === 'admin' && (
                       <button
                         onClick={() => onEdit(row)}
                         className='text-green-500 mr-5'
                       >
-                        {title === 'Applicant'
-                          ? 'View Application'
-                          : title === 'Requirement' || title === 'sk' || title === 'kk'
-                          ? 'View'
-                          : 'Edit'}
+                        View
                       </button>
                     )}
 

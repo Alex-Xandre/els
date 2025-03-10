@@ -18,6 +18,8 @@ import NewAssesment from './pages/courses/assesment/new-assesment';
 import UserHome from './pages/user';
 import NewUser from './pages/user/new';
 import HomeStudent from './pages/dashboard/HomeStudent';
+import Progress from './pages/progress';
+import PreviewAssessment from './pages/courses/assesment/view-assesment-summary';
 
 const App = () => {
   const { isLoggedIn, user, dispatch } = useAuth();
@@ -51,6 +53,10 @@ const App = () => {
 
     { path: '/users', element: <UserHome /> },
     { path: '/users/new', element: <NewUser /> },
+
+    { path: '/progress', element: <Progress /> },
+
+    { path: '/:studId/submissions/view', element: <ViewModule /> },
   ];
 
   const studentRoutes = [

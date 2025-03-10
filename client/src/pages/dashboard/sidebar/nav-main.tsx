@@ -40,7 +40,7 @@ export function NavMain({
   const myParamValue = searchParams.get('');
 
   useEffect(() => {
-    console.log(item, myParamValue);
+
     if (item) {
       if (item.pathname.includes('new') || item.pathname.includes('moduleId')) {
         return;

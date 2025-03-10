@@ -41,7 +41,13 @@ const submissionSchema = new Schema({
     of: String,
     required: true,
   },
+  scores: {
+    type: Map,
+    of: String,
+    required: true,
+  },
   submissionDate: Date,
+  checked: { type: Date, default: Date.now() },
   attempts: Number,
   score: { type: Number, default: 0 },
   isGraded: { type: Boolean, default: false },

@@ -99,6 +99,7 @@ const ViewModule = () => {
     { label: module.title, href: `/moduleId?=${module._id}`, isCurrentPage: true },
   ];
 
+
   const [isInstruction, setIsInstructions] = useState(true);
   const lastItemScore = submissions.length > 0 ? submissions[submissions.length - 1].score : null;
   const renderItems = useCallback(() => {
@@ -303,14 +304,12 @@ const ViewModule = () => {
     }
   };
 
-  console.log(submissions);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await getSubmisions(currentId._id);
 
-        console.log(data);
+       
         if (data.length > 0) {
           setIsInstructions(false);
         }

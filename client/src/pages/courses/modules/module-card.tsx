@@ -130,7 +130,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
             {/* Activities */}
             {activity.filter((x) => x.moduleId?._id === module._id).length > 0 && (
               <span className='inline-flex items-center text-green-900 text-xs'>
-                {activity.length}
+                {activity.filter((x) => x.moduleId?._id === module._id).length}
                 <BookCheckIcon className='h-3' />
               </span>
             )}

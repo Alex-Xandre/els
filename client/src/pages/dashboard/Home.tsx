@@ -15,6 +15,7 @@ import NavContainer from '@/components/nav-container';
 import Title from '@/components/ui/title';
 import { Button } from '@/components/ui/button';
 import { Doughnut } from 'react-chartjs-2';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
   const { user, allUser } = useAuth();
@@ -29,7 +30,6 @@ const Home = () => {
   useFetchAndDispatch(getStudentProgress, 'SET_PROGRESS', user._id);
   useFetchAndDispatch(getSubmisions, 'SET_SUBMISSION');
   useFetchAndDispatch(getAllUser, 'GET_ALL_USER');
-
 
   // Chart.js options
   const chartOptions = {
@@ -115,7 +115,7 @@ const Home = () => {
     [courses]
   );
 
-  console.log(columns);
+  const navigate = useNavigate();
   return (
     <Container>
       <nav className='inline-flex items-center justify-between w-full pr-4 '>
@@ -198,6 +198,13 @@ const Home = () => {
                 <Button>View More Details</Button>
               </NavContainer>
             }
+            onEdit={(item) =>
+              navigate(`/progress?=${item?._id}`, {
+                state: { isEdit: true },
+              })
+            }
+
+          
             data={allUser
               .filter((x) => x.role === 'user')
               .map((item) => {

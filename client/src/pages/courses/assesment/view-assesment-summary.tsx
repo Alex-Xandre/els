@@ -10,7 +10,7 @@ interface PreviewAssesmentI {
   hadnleQuestionIndex: (index: number) => void;
 }
 
-const PreviewAssessment: React.FC<PreviewAssesmentI> = ({ assesment, hadnleQuestionIndex, handleAssesmentChange }) => {
+const PreviewAssessment: React.FC<PreviewAssesmentI> = ({ assesment, hadnleQuestionIndex }) => {
   const renderQuestion = (question: QuestionTypes, index: number) => {
     switch (question.questionType) {
       case 'multiple-choice':
@@ -67,8 +67,6 @@ const PreviewAssessment: React.FC<PreviewAssesmentI> = ({ assesment, hadnleQuest
         return null;
     }
   };
-
-
 
   const totalPoints = assesment.questions.reduce((total, question) => total + parseInt(question.questionPoints), 0);
 

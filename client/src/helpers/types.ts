@@ -126,12 +126,14 @@ export interface ProgressType {
 }
 
 export interface SubmissionType {
+  _id?: string;
   user: string;
   activityId: string;
   answers: any;
   submissionDate: Date;
   attempts: number;
   score: number;
+  scores?: any;
   isGraded: boolean;
 }
 

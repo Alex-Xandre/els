@@ -57,7 +57,7 @@ const NewAssesment = () => {
     if (myParamValue) {
       const items = activity.find((item) => item._id === myParamValue);
 
-      console.log(items)
+     
       if (!items) return;
 
       setAssesment({ ...items,

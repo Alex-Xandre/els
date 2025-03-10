@@ -56,7 +56,7 @@ const NewSection = () => {
     }
   }, [ item.search]);
 
-  console.log(section);
+  
 
   const breadcrumbItems = [
     { label: 'Home', href: '/' },

@@ -8,8 +8,9 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": false,
-    "strictNullChecks": false, // Relax strict null checks
-    "noImplicitAny": false, // Relax implicit 'any' type checks
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "noUncheckedIndexedAccess": false, 
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
     "moduleResolution": "Node",

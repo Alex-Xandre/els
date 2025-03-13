@@ -6,6 +6,7 @@ import {
   Command,
   Frame,
   GalleryVerticalEnd,
+  LogOutIcon,
   Map,
   PanelLeft,
   PieChart,
@@ -121,7 +122,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <Button onClick={onLogout}>Logout</Button>
+        <Button
+          className='items-center h-fit inline-flex  text-sm gap-x-2 mb-5'
+          onClick={onLogout}
+        >
+          <LogOutIcon className='ml-2 h-5' />
+          {open && 'Logout'}{' '}
+        </Button>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

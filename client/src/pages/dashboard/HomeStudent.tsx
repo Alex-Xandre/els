@@ -25,7 +25,6 @@ const HomeStudent = () => {
   useFetchAndDispatch(getAllTimeline, 'GET_ALL_TIMELINES');
   useFetchAndDispatch(getStudentProgress, 'SET_PROGRESS', user._id);
 
-  
   const studentProgress = progress.find((item) => item.studentId === user._id);
 
   const completedLessons = studentProgress?.completedLessons?.length || 0;
@@ -62,6 +61,15 @@ const HomeStudent = () => {
       mode: null, // Disables hover interactions
     },
   };
+
+  const now = new Date();
+  const oneWeekLater = new Date();
+  oneWeekLater.setDate(now.getDate() + 7);
+
+  const filteredData = activity.filter((item) => {
+    const itemDate = new Date(item.assesmentDueDate);
+    return itemDate >= now && itemDate <= oneWeekLater;
+  });
 
   return (
     <Container>
@@ -151,7 +159,18 @@ const HomeStudent = () => {
 
           <div className='border mx-5 pb-5 rounded-md mt-5 '>
             <h1 className='text-sm font-semibold w-full p-3'>Upcoming</h1>
-            <h2 className='px-3 text-sm'> ❌ No Upcoming Activities </h2>
+            {filteredData.length === 0 ? (
+              <h2 className='px-3 text-sm'> ❌ No Upcoming Activities </h2>
+            ) : (
+              <div className='flex flex-col px-3 w-full'>
+                {filteredData.map((item) => (
+                  <span className='text-sm border rounded-md w-full p-1 flex flex-col'>
+                    <span>{item.title}</span>
+                    <span>{new Date(item.assesmentDueDate).toLocaleDateString()}</span>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

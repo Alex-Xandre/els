@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Sidebar } from './sidebar/Sidebar';
 import Container from '@/components/container';
 import { useAuth } from '@/stores/AuthContext';
-import { BellIcon, Hourglass } from 'lucide-react';
+import { BellIcon, Hourglass, X } from 'lucide-react';
 import { LeftCalendar } from './LeftCalendar';
 import { useCourse } from '@/stores/CourseContext';
 import CourseCard from './course-card';
@@ -116,6 +116,31 @@ const Home = () => {
   );
 
   const navigate = useNavigate();
+
+  console.log(submissions);
+
+  const groupedSubmissions = submissions.reduce((acc, item) => {
+    const key = `${item.user}-${item.activityId}`;
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(item);
+    return acc;
+  }, {});
+
+  const uniqueGroups = new Set(
+    Object.entries(groupedSubmissions)
+      .filter(([_, group]) => !group.some((sub) => sub.isGraded)) // Exclude if any entry is graded
+      .map(([key]) => key)
+  );
+
+  const now = new Date();
+  const oneWeekLater = new Date();
+  oneWeekLater.setDate(now.getDate() + 7);
+
+  const filteredData = activity.filter((item) => {
+    const itemDate = new Date(item.assesmentDueDate);
+    return itemDate >= now && itemDate <= oneWeekLater;
+  });
+
   return (
     <Container>
       <nav className='inline-flex items-center justify-between w-full pr-4 '>
@@ -174,17 +199,28 @@ const Home = () => {
 
           <div className='border mx-5 pb-5 rounded-md mt-5 '>
             <h1 className='text-sm font-semibold w-full p-3'>Upcoming</h1>
-            <h2 className='px-3 text-sm'> ❌ No Upcoming Activities </h2>
+            {filteredData.length === 0 ? (
+              <h2 className='px-3 text-sm'> ❌ No Upcoming Activities </h2>
+            ) : (
+              <div className='flex flex-col px-3 w-full'>
+                {filteredData.map((item) => (
+                  <span className='text-sm border rounded-md w-full p-1 flex flex-col'>
+                    <span>{item.title}</span>
+                    <span>{new Date(item.assesmentDueDate).toLocaleDateString() }</span>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className='border mx-5 pb-5 rounded-md mt-5 '>
             <h1 className='text-sm font-semibold w-full p-3'>To Grade</h1>
-            {submissions.filter((x) => x.isGraded === false).length === 0 ? (
+            {uniqueGroups.size === 0 ? (
               <h2 className='px-3 text-sm'> ❌ All submissions Graded </h2>
             ) : (
               <h2 className='px-1 text-sm border mx-3 rounded py-1 flex items-center '>
                 <Hourglass className='h-5 text-red-600' />
-                {submissions.filter((x) => !x.isGraded).length} Submissions
+                {uniqueGroups.size} Submissions
               </h2>
             )}
           </div>
@@ -203,8 +239,6 @@ const Home = () => {
                 state: { isEdit: true },
               })
             }
-
-          
             data={allUser
               .filter((x) => x.role === 'user')
               .map((item) => {

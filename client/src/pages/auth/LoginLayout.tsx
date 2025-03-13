@@ -98,12 +98,12 @@ const LoginLayout = () => {
               </Button>
             </div>
 
-            <div className='text-sm'>
+            {/* <div className='text-sm'>
               Don't have an account?
               <span>
                 <Button variant='link'> Sign up</Button>
               </span>
-            </div>
+            </div> */}
           </div>
         </div>
       </section>

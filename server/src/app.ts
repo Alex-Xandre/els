@@ -19,7 +19,7 @@ const port = 5000;
 const server = createServer(app);
 
 const corsOptions = {
-  origin: ['http://localhost:5173', 'https://elms-dmmssu.vercel.app/'],
+  origin: ['http://localhost:5173', 'https://elms-dmmssu.vercel.app'],
 };
 
 const io = new Server(server, {

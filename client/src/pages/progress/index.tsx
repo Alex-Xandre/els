@@ -74,7 +74,7 @@ const Progress = () => {
   };
  
   const handleSelectUser = (user) => {
-    setSearchQuery(`${user.personalData.firstName} ${user.personalData.lastName}`);
+    setSearchQuery(`${user?.personalData?.firstName} ${user?.personalData?.lastName}`);
     setFilteredUsers([]);
     setSelectedUser(user._id);
     setNoMatch(false);
@@ -151,13 +151,13 @@ const Progress = () => {
           />
           {filteredUsers.length > 0 && (
             <div className='absolute w-full bg-white border rounded-md shadow-md z-10 mt-1 max-h-60 overflow-auto'>
-              {filteredUsers.map((user) => (
+              {filteredUsers.filter((x) =>x.role ==="user").map((user) => (
                 <div
                   key={user.id}
                   className='p-2 cursor-pointer hover:bg-gray-100'
                   onClick={() => handleSelectUser(user)}
                 >
-                  {user.personalData.firstName} {user.personalData.lastName}
+                  {user.personalData?.firstName} {user.personalData?.lastName}
                 </div>
               ))}
             </div>

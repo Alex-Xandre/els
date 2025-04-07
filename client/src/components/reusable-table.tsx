@@ -119,14 +119,14 @@ const ReusableTable = <T,>({
                       </button>
                     )}
 
-                    {onView && (
+                    {/* {onView && (
                       <button
                         onClick={() => onView(row)}
                         className=' mr-5'
                       >
                         View
                       </button>
-                    )}
+                    )} */}
                   </TableCell>
                 )}
               </TableRow>

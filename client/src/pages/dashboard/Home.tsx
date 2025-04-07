@@ -154,9 +154,9 @@ const Home = () => {
             src={user.profile}
             className='h-8 w-8'
           />
-          <span className=' p-1 py-2 '>
+          {/* <span className=' p-1 py-2 '>
             <BellIcon className='h-4' />
-          </span>
+          </span> */}
         </div>
       </nav>
 
@@ -191,7 +191,7 @@ const Home = () => {
           })}
         </div>
 
-        <div className=' absolute right-4'>
+        <div className=' absolute right-4 pb-24'>
           <div className='border mx-5 pb-5 rounded-md '>
             <h1 className='text-sm font-semibold w-full p-3'>School Calendar</h1>
             <LeftCalendar />

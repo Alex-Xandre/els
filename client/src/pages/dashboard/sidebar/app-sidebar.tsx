@@ -1,20 +1,5 @@
 import * as React from 'react';
-import {
-  AppWindowIcon,
-  AudioWaveform,
-  BookOpen,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  LogOutIcon,
-  Map,
-  PanelLeft,
-  PieChart,
-  RefreshCcw,
-  Settings2,
-  UserIcon,
-  XIcon,
-} from 'lucide-react';
+import { AppWindowIcon, BookOpen, LogOutIcon, PanelLeft, RefreshCcw, UserIcon, XIcon } from 'lucide-react';
 
 import {
   Sidebar,
@@ -102,35 +87,36 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   return (
-    <Sidebar
-      collapsible='icon'
-      {...props}
-    >
-      <nav className=' border-b absolute top-0 z-50 h-12 w-screen justify-between inline-flex bg-blue-500'>
-        <button
-          onClick={toggleSidebar}
-          className=' bg-white  p-1.5 m-1.5 cursor-pointer   shadow-sm rounded-sm w-fit'
-        >
-          {open ? <XIcon className='h-4' /> : <PanelLeft className='h-4' />}
-        </button>
+    <>
+      <Sidebar
+        collapsible='icon'
+        {...props}
+      >
+        <nav className=' border-b  top-0 z-50 h-12 w-screen justify-between lg:inline-flex bg-blue-500 Z-50  fixed '>
+          <button
+            onClick={toggleSidebar}
+            className=' bg-white  p-1.5 m-1.5 cursor-pointer   shadow-sm rounded-sm w-fit'
+          >
+            {open ? <XIcon className='h-4' /> : <PanelLeft className='h-4' />}
+          </button>
 
-        <p className={`absolute font-semibold top-3 ${open ? 'left-64 ml-10' : 'left-16 ml-2'}`}> </p>
-      </nav>
-
-      <SidebarHeader>{/* <TeamSwitcher teams={data.teams} /> */}</SidebarHeader>
-      <SidebarContent className='mt-14'>
-        <NavMain items={data.navMain} />
-      </SidebarContent>
-      <SidebarFooter>
-        <Button
-          className='items-center h-fit inline-flex  text-sm gap-x-2 mb-5'
-          onClick={onLogout}
-        >
-          <LogOutIcon className='ml-2 h-5' />
-          {open && 'Logout'}{' '}
-        </Button>
-      </SidebarFooter>
-      <SidebarRail />
-    </Sidebar>
+          <p className={`absolute font-semibold top-3 ${open ? 'left-64 ml-10' : 'left-16 ml-2'}`}> </p>
+        </nav>
+        <SidebarHeader>{/* <TeamSwitcher teams={data.teams} /> */}</SidebarHeader>
+        <SidebarContent className=''>
+          <NavMain items={data.navMain} />
+        </SidebarContent>
+        <SidebarFooter>
+          <Button
+            className='items-center h-fit inline-flex  text-sm gap-x-2 mb-5'
+            onClick={onLogout}
+          >
+            <LogOutIcon className='ml-2 h-5' />
+            {open && 'Logout'}{' '}
+          </Button>
+        </SidebarFooter>
+        <SidebarRail />
+      </Sidebar>
+    </>
   );
 }

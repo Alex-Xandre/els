@@ -7,12 +7,13 @@ import { ActivityIcon, BookCheckIcon, EyeIcon, FolderIcon, PencilIcon } from 'lu
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Doughnut } from 'react-chartjs-2';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, ArcElement, Legend } from 'chart.js';
 import { getRandomCover } from '../sections/view-section';
 import { registerTimeline } from '@/api/get.info.api';
 import { createTimelineData } from '@/helpers/createTimelineData';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(ArcElement, Legend);
 
 interface ModuleCardProps {
   module: ModuleTypes;
@@ -96,8 +97,17 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
         <h2 className='text- font-semibold text-gray-800 mb-2'>{module.title}</h2>
 
         {/* Description */}
-        <p className='text-sm text-gray-600 line-clamp-3'>{module.description}</p>
 
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <p className='text-sm text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden w-60 m-0 text-left'>
+                {module.description}
+              </p>
+            </TooltipTrigger>
+            <TooltipContent>{module.description}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         {/* Admin Controls */}
         {user.role === 'admin' && (
           <div className='inline-flex w-full justify-end gap-x-2'>

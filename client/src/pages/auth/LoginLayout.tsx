@@ -43,9 +43,9 @@ const LoginLayout = () => {
 
   return (
     <main className='w-full h-screen flex'>
-     
       <section className=' w-full p-6 bg-muted shadow-lg rounded-lg flex justify-center items-center'>
-        <div className='w-1/3 space-y-3  p-5   shadow-md rounded-lg bg-white'>
+        <div className='lg:w-1/3 space-y-3  p-5   shadow-md rounded-lg bg-white'>
+          <h1 className='border-b font-medium pb-5'>ELECTRONIC PRODUCTS ASSEMBLY AND SERVICING LEARNING MANAGEMENT APPLICATION (EPAS LMA)</h1>
           <h1 className='text-xl  font-semibold'>Login Account</h1>
           <p className='text-sm mb-5'>Enter your ID and password below to login to your account</p>
           <div className='space-y-4'>
@@ -61,7 +61,7 @@ const LoginLayout = () => {
                   id='email'
                   placeholder='user-sample'
                   className='w-full'
-                  icon={<UserIcon />}
+                  icon={<UserIcon  className='h-4'/>}
                   onChange={(event) => setData({ ...data, userId: event.target.value })}
                 />
               </div>
@@ -79,9 +79,9 @@ const LoginLayout = () => {
                   className='w-full'
                   icon={
                     showPassword ? (
-                      <EyeIcon onClick={() => handleShowPassword()} />
+                      <EyeIcon className='h-4' onClick={() => handleShowPassword()} />
                     ) : (
-                      <EyeClosedIcon onClick={() => handleShowPassword()} />
+                      <EyeClosedIcon className='h-4' onClick={() => handleShowPassword()} />
                     )
                   }
                   type={showPassword ? 'password' : 'text'}

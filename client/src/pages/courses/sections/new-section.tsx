@@ -216,6 +216,20 @@ const NewSection = () => {
             )}
           </div>
         ))}
+         {section.sectionType === "link" && (
+          <>
+            <Label>Drive Link</Label>
+
+            <Input
+            className="-mt-5"
+              type="text"
+              placeholder=""
+              name="resource"
+              value={section["resource" as keyof SectionTypes] as string}
+              onChange={handleChange}
+            />
+          </>
+        )}
         {section._id !== "" &&
           section?.resource &&
           section?.sectionType === "link" && (

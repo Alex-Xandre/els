@@ -278,6 +278,7 @@ const ViewModule = () => {
       case "excel":
         return <PDFView currentId={currentId as SectionTypes} />;
       case "video":
+      case "link":
         return <VideoView currentId={currentId as SectionTypes} />;
       default:
         return null;
@@ -445,10 +446,12 @@ const ViewModule = () => {
         </>
       ) : (
         <>
-          {sections.filter((x) => x.isDeleted === false && module._id === x.moduleId?._id) .length === 0 &&
-            activity.filter((x) => x.isDeleted === false && module._id === x.moduleId?._id).length === 0 && (
-              <p>No data found</p>
-            )}
+          {sections.filter(
+            (x) => x.isDeleted === false && module._id === x.moduleId?._id
+          ).length === 0 &&
+            activity.filter(
+              (x) => x.isDeleted === false && module._id === x.moduleId?._id
+            ).length === 0 && <p>No data found</p>}
 
           {organizeSection.map((item, index) => {
             const findSection: SectionTypes = sections.find(

@@ -34,11 +34,11 @@ module.exports = (req, res, next) => {
   }
 
   // file size
-  if (req.file.size > 10 * 1024 * 1024) {
-    // Updated size limit to 10MB
+  if (req.file.size > 100 * 1024 * 1024) {
+    // Updated size limit to 100MB
     // remove file
     fs.unlinkSync(file);
-    return res.status(400).json({ msg: "This file is too large (Max: 10MB)" });
+    return res.status(400).json({ msg: "This file is too large (Max: 100MB)" });
   }
 
   // success

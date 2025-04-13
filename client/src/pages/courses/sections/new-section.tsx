@@ -171,6 +171,7 @@ const NewSection = () => {
                   <SelectItem value="pdf">PDF Document</SelectItem>
                   <SelectItem value="excel">Excel</SelectItem>
                   <SelectItem value="video">Video</SelectItem>
+                  <SelectItem value="link">Video Link</SelectItem>
                 </SelectContent>
               </Select>
             ) : field.type === "textarea" ? (
@@ -197,6 +198,20 @@ const NewSection = () => {
             )}
           </div>
         ))}
+        {section.sectionType === "link" && (
+          <>
+            <Label>Drive Link</Label>
+
+            <Input
+            className="-mt-5"
+              type="text"
+              placeholder=""
+              name="resource"
+              value={section["resource" as keyof SectionTypes] as string}
+              onChange={handleChange}
+            />
+          </>
+        )}
 
         <div className="w-full">
           {section.cover && (
@@ -214,7 +229,6 @@ const NewSection = () => {
             </div>
           )}
         </div>
-
         <div className="flex items-center justify-between w-full pb-20">
           <div className="m-0">
             <Button type="submit">Add Lectures</Button>
@@ -227,28 +241,30 @@ const NewSection = () => {
               Cancel
             </Button>
           </div>
-     {section?._id !==""&&      <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" type="button" className="m-0">
-                Delete Section
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete
-                  this lesson.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete}>
-                  Continue
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>}
+          {section?._id !== "" && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" type="button" className="m-0">
+                  Delete Section
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete
+                    this lesson.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete}>
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
       </form>
     </Container>

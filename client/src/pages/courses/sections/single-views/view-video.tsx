@@ -1,10 +1,11 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { updateProgress } from '@/api/course.api';
-import { SectionTypes } from '@/helpers/types';
-import { useAuth } from '@/stores/AuthContext';
-import { Play, Pause, Maximize, Minimize } from 'lucide-react';
-import { registerTimeline } from '@/api/get.info.api';
-import { createTimelineData } from '@/helpers/createTimelineData';
+import React, { useRef, useState, useEffect } from "react";
+import { updateProgress } from "@/api/course.api";
+import { SectionTypes } from "@/helpers/types";
+import { useAuth } from "@/stores/AuthContext";
+import { Play, Pause, Maximize, Minimize } from "lucide-react";
+import { registerTimeline } from "@/api/get.info.api";
+import { createTimelineData } from "@/helpers/createTimelineData";
+import toast from "react-hot-toast";
 
 interface PDFViewProps {
   currentId: SectionTypes;
@@ -17,6 +18,24 @@ const VideoView: React.FC<PDFViewProps> = ({ currentId }) => {
   const [duration, setDuration] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  const [driveLink, setDriveLink] = useState(currentId?.resource); // Store the Google Drive link
+  const [embedUrl, setEmbedUrl] = useState("");
+
+  useEffect(() => {
+    if (driveLink) {
+      // Extract the file ID from the Google Drive link using regex
+      const fileId = driveLink.match(/\/d\/(.*?)\//);
+      if (fileId) {
+        // Construct the embed URL for the iframe
+        setEmbedUrl(`https://drive.google.com/file/d/${fileId[1]}/preview`);
+      } else {
+        setEmbedUrl("");
+      }
+    } else {
+      setEmbedUrl("");
+    }
+  }, [driveLink]);
+
   useEffect(() => {
     if (videoRef.current) {
       const videoElement = videoRef.current;
@@ -25,10 +44,13 @@ const VideoView: React.FC<PDFViewProps> = ({ currentId }) => {
         setDuration(videoElement.duration);
       };
 
-      videoElement.addEventListener('loadedmetadata', handleLoadedMetadata);
+      videoElement.addEventListener("loadedmetadata", handleLoadedMetadata);
 
       return () => {
-        videoElement.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        videoElement.removeEventListener(
+          "loadedmetadata",
+          handleLoadedMetadata
+        );
       };
     }
   }, []);
@@ -36,13 +58,13 @@ const VideoView: React.FC<PDFViewProps> = ({ currentId }) => {
   const handleVideoEnd = async () => {
     if (videoRef.current) {
       const res = await updateProgress(user._id, currentId._id);
-      dispatch({ type: 'UPDATE_PROGRESS', payload: res });
+      dispatch({ type: "UPDATE_PROGRESS", payload: res });
       dispatch(
         registerTimeline(
           createTimelineData({
             user: user._id,
             section: currentId._id,
-            activityType: 'completed',
+            activityType: "completed",
             text: `Completed ${currentId.title}`,
           })
         )
@@ -62,7 +84,8 @@ const VideoView: React.FC<PDFViewProps> = ({ currentId }) => {
 
   const handleVideoSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (videoRef.current) {
-      const seekTime = (videoRef.current.duration * parseFloat(e.target.value)) / 100;
+      const seekTime =
+        (videoRef.current.duration * parseFloat(e.target.value)) / 100;
       videoRef.current.currentTime = seekTime;
     }
   };
@@ -70,7 +93,7 @@ const VideoView: React.FC<PDFViewProps> = ({ currentId }) => {
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
   const handleTimeUpdate = () => {
@@ -90,75 +113,90 @@ const VideoView: React.FC<PDFViewProps> = ({ currentId }) => {
     }
   };
 
+  const handleRightClick = (e) => {
+    e.preventDefault();
+    alert("Right-click is disabled.");
+  };
   return (
     <div
-      className={`mt-16 flex flex-col items-center justify-center w-full h-full mx-auto ${
-        isFullscreen ? 'absolute top-0 left-0 right-0 bottom-0' : 'w-2/3 h-80'
+      className={`mt-16 flex m-0 flex-col items-center  w-full h-full mx-auto ${
+        isFullscreen ? "absolute top-0 left-0 right-0 bottom-0" : "w-2/3 h-80"
       }`}
     >
-      <p className='text-xs mb-2 text-start w-full mt-3'>{currentId?.description}</p>
-      {currentId?.resource && (
-        <div className='relative h-96 '>
+      <p className="text-xs mb-2 text-start w-full mt-3 m-0">
+        {currentId?.description}
+      </p>
+
+      {currentId?.sectionType === "link" && currentId?.resource && (
+        <div className="relative w-[700px] h-[500px]">
+          <iframe
+            src={embedUrl}
+            className="absolute top-0 left-0 w-full h-full z-10"
+            allow="autoplay; encrypted-media"
+            allowFullScreen
+            sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+            title="Google Drive Video"
+            onContextMenu={handleRightClick} // Disable right-click
+          />
+          <div
+          onClick={() => toast.error("Sharing not allowed")}
+            className="absolute top-0 right-0 w-12
+               h-12
+               bg-transparent 
+               z-20"
+          />
+        </div>
+      )}
+
+      {currentId?.resource && currentId.sectionType === "video" && (
+        <div className="relative h-96 ">
           <video
             ref={videoRef}
             onEnded={handleVideoEnd}
             onTimeUpdate={handleTimeUpdate}
             controls={false}
             onContextMenu={(e) => e.preventDefault()}
-            className='w-full h-full  object-cover'
+            className="w-full h-full  object-cover"
           >
-            <source
-              src={currentId.resource}
-              type='video/mp4'
-            />
+            <source src={currentId.resource} type="video/mp4" />
           </video>
 
           {/* Custom Controls */}
-          <div className='absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-transparent to-transparent p-2 flex justify-between items-center'>
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-transparent to-transparent p-2 flex justify-between items-center">
             <button
               onClick={handlePlayPause}
-              className='bg-gray-800 text-white px-3 py-2 rounded-full text-sm'
+              className="bg-gray-800 text-white px-3 py-2 rounded-full text-sm"
             >
               {videoRef.current && videoRef.current.paused ? (
-                <Play
-                  size={20}
-                  className='h-4'
-                />
+                <Play size={20} className="h-4" />
               ) : (
-                <Pause
-                  size={20}
-                  className='h-4'
-                />
+                <Pause size={20} className="h-4" />
               )}
             </button>
 
-            <div className='flex items-center space-x-3 w-full px-3'>
-              <span className='text-white text-sm'>{formatTime(currentTime)}</span>
+            <div className="flex items-center space-x-3 w-full px-3">
+              <span className="text-white text-sm">
+                {formatTime(currentTime)}
+              </span>
               <input
-                type='range'
-                min='0'
-                max='100'
+                type="range"
+                min="0"
+                max="100"
                 value={duration > 0 ? (currentTime / duration) * 100 : 0}
-                className='w-64 h-1 bg-gray-400 rounded-full flex-1'
+                className="w-64 h-1 bg-gray-400 rounded-full flex-1"
                 onChange={handleVideoSeek}
               />
-              <span className='text-white text-sm'>{formatTime(duration)}</span>
+              <span className="text-white text-sm">{formatTime(duration)}</span>
             </div>
 
             <button
               onClick={toggleFullscreen}
-              className='bg-gray-800 text-white px-4 py-2 rounded-full text-sm'
+              className="bg-gray-800 text-white px-4 py-2 rounded-full text-sm"
             >
               {isFullscreen ? (
-                <Minimize
-                  size={20}
-                  className='h-4'
-                />
+                <Minimize size={20} className="h-4" />
               ) : (
-                <Maximize
-                  size={20}
-                  className='h-4'
-                />
+                <Maximize size={20} className="h-4" />
               )}
             </button>
           </div>

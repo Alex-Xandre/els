@@ -1,11 +1,11 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model } from "mongoose";
 
 // Define the cover image links
 const coverImages = [
-  'https://res.cloudinary.com/dgb3br9x6/image/upload/v1737850853/cover1_h28tl3.webp',
-  'https://res.cloudinary.com/dgb3br9x6/image/upload/v1737850853/cover2_tqh446.webp',
-  'https://res.cloudinary.com/dgb3br9x6/image/upload/v1737850853/cover3_soq0xt.webp',
-  'https://res.cloudinary.com/dgb3br9x6/image/upload/v1737850853/cover4_d5j1re.webp',
+  "https://res.cloudinary.com/dgb3br9x6/image/upload/v1737850853/cover1_h28tl3.webp",
+  "https://res.cloudinary.com/dgb3br9x6/image/upload/v1737850853/cover2_tqh446.webp",
+  "https://res.cloudinary.com/dgb3br9x6/image/upload/v1737850853/cover3_soq0xt.webp",
+  "https://res.cloudinary.com/dgb3br9x6/image/upload/v1737850853/cover4_d5j1re.webp",
 ];
 
 // Utility function to get a random cover image
@@ -22,9 +22,10 @@ const sectionSchema = new Schema(
     resource: { type: String },
     description: String,
     isUnlock: { type: Boolean, default: false },
-    moduleId: { type: Schema.Types.ObjectId, ref: 'Module', required: true },
+    moduleId: { type: Schema.Types.ObjectId, ref: "Module", required: true },
     sectionType: String,
     cover: { type: String, default: getRandomCover() },
+    isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
@@ -34,8 +35,9 @@ const moduleSchema = new Schema(
   {
     title: { type: String, required: true },
     description: { type: String, required: true },
-    courseId: { type: Schema.Types.ObjectId, ref: 'Course', required: true },
+    courseId: { type: Schema.Types.ObjectId, ref: "Course", required: true },
     cover: { type: String, default: getRandomCover() },
+    isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
@@ -53,6 +55,6 @@ const courseSchema = new Schema(
 );
 
 // Export the models
-export const Section = model('Section', sectionSchema);
-export const Module = model('Module', moduleSchema);
-export const Course = model('Course', courseSchema);
+export const Section = model("Section", sectionSchema);
+export const Module = model("Module", moduleSchema);
+export const Course = model("Course", courseSchema);

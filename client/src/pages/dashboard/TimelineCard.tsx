@@ -61,7 +61,7 @@ const TimelineCard: FC<{ data: TimelineActivityType }> = ({ data }) => {
     .join(' | ');
   const { allUser, user } = useAuth();
   const [firstWord, ...restWords] = data.text.split(' ');
-  const findUser = allUser.find((x) => x._id === data.user);
+  const findUser = allUser.filter((x) => x.isDeleted === false).find((x) => x._id === data.user);
   return (
     <div className={` m-1 w-full  bg-white`}>
       <div className='inline-flex w-full justify-between mt-1'>

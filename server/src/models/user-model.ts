@@ -1,5 +1,5 @@
-import { Schema, model } from 'mongoose';
-import { UserTypes } from '../types';
+import { Schema, model } from "mongoose";
+import { UserTypes } from "../types";
 
 const addressSchema = new Schema(
   {
@@ -36,15 +36,17 @@ const userSchema = new Schema<UserTypes>(
   {
     profile: {
       type: String,
-      default: 'https://res.cloudinary.com/dyhsose70/image/upload/v1696562163/avatar_ko5htr.png',
+      default:
+        "https://res.cloudinary.com/dyhsose70/image/upload/v1696562163/avatar_ko5htr.png",
     },
     password: String,
-    role: { type: String, enum: ['admin', 'user'], default: 'user' },
+    role: { type: String, enum: ["admin", "user"], default: "user" },
     userId: String,
     personalData: personalSchema,
     email: String,
     status: { type: Boolean, default: true },
+    isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
-export default model<UserTypes>('User', userSchema);
+export default model<UserTypes>("User", userSchema);

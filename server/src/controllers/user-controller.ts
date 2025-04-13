@@ -67,6 +67,10 @@ export const loginUser = expressAsyncHandler(async (req, res) => {
       if (!user.status) {
         res.status(401).json({ msg: 'Account not active' });
       }
+      if (user.isDeleted) {
+        res.status(401).json({ msg: 'Account not active' });
+      }
+      
       // Invalidate all previous sessions for this user
       await Session.deleteMany({ user: user._id });
 

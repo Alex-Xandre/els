@@ -21,5 +21,6 @@ export const uploadFile = async (file: File): Promise<string> => {
   } catch (err: any) {
     toast.error(err.response?.data?.msg || 'Upload failed');
     throw new Error(err.response?.data?.msg || 'Upload failed');
+    toast.dismiss()
   }
 };

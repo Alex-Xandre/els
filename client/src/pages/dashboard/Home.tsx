@@ -117,7 +117,6 @@ const Home = () => {
 
   const navigate = useNavigate();
 
-  console.log(submissions);
 
   const groupedSubmissions = submissions.reduce((acc, item) => {
     const key = `${item.user}-${item.activityId}`;
@@ -240,7 +239,7 @@ const Home = () => {
               })
             }
             data={allUser
-              .filter((x) => x.role === 'user')
+              .filter((x) => x.role === 'user' && x.isDeleted === false)
               .map((item) => {
                 //overall progress
                 const studentProgress = progress.find((x) => x.studentId === item._id);

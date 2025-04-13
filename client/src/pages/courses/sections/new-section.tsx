@@ -1,43 +1,65 @@
-import { createOrUpdateSection, getAllModules, getAllSections } from '@/api/course.api';
-import Breadcrumb from '@/components/bread-crumb';
-import Container from '@/components/container';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import Title from '@/components/ui/title';
-import { handleFileChange } from '@/helpers/file-upload';
-import { SectionTypes } from '@/helpers/types';
-import { useFetchAndDispatch } from '@/helpers/useFetch';
-import { useCourse } from '@/stores/CourseContext';
-import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import {
+  createOrUpdateSection,
+  getAllModules,
+  getAllSections,
+} from "@/api/course.api";
+import Breadcrumb from "@/components/bread-crumb";
+import Container from "@/components/container";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import Title from "@/components/ui/title";
+import { handleFileChange } from "@/helpers/file-upload";
+import { SectionTypes } from "@/helpers/types";
+import { useFetchAndDispatch } from "@/helpers/useFetch";
+import { useCourse } from "@/stores/CourseContext";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import toast from 'react-hot-toast';
-import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import toast from "react-hot-toast";
+import { Button } from "@/components/ui/button";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const NewSection = () => {
   const { sectionId } = useParams();
   const { sections, modules } = useCourse();
   const navigate = useNavigate();
-  useFetchAndDispatch(getAllModules, 'SET_MODULES');
-  useFetchAndDispatch(getAllSections, 'SET_SECTIONS');
+  useFetchAndDispatch(getAllModules, "SET_MODULES");
+  useFetchAndDispatch(getAllSections, "SET_SECTIONS");
   const [section, setSection] = useState<SectionTypes>({
-    _id: '',
-    title: '',
-    videoUrl: '',
-    resource: '',
+    _id: "",
+    title: "",
+    videoUrl: "",
+    resource: "",
     moduleId: sectionId,
-    sectionType: '',
-    cover: '',
+    sectionType: "",
+    cover: "",
   });
 
   const formFields = [
-    { name: 'sectionType', label: 'Type', type: 'option' },
-    { name: 'title', label: 'Title', type: 'text' },
-    { name: 'description', label: 'Description', type: 'textarea' },
-    { name: 'resource', label: 'Resource', type: 'file' },
-    { name: 'cover', label: 'Banner', type: 'file' },
+    { name: "sectionType", label: "Type", type: "option" },
+    { name: "title", label: "Title", type: "text" },
+    { name: "description", label: "Description", type: "textarea" },
+    { name: "resource", label: "Resource", type: "file" },
+    { name: "cover", label: "Banner", type: "file" },
   ];
 
   const courseId = modules.find((item) => item._id === sectionId);
@@ -46,7 +68,7 @@ const NewSection = () => {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(item.search);
-    const myParamValue = searchParams.get('');
+    const myParamValue = searchParams.get("");
 
     if (myParamValue) {
       const items = sections.find((item) => item._id === myParamValue);
@@ -54,17 +76,22 @@ const NewSection = () => {
       if (!items) return;
       setSection(items);
     }
-  }, [ item.search]);
-
-  
+  }, [item.search]);
 
   const breadcrumbItems = [
-    { label: 'Home', href: '/' },
-    { label: `${courseId?.title}`, href: `/${courseId?.courseId._id}/view?=${sectionId}` },
-    { label: section?._id === '' ? 'New' : 'Edit', isCurrentPage: true },
+    { label: "Home", href: "/" },
+    {
+      label: `${courseId?.title}`,
+      href: `/${courseId?.courseId._id}/view?=${sectionId}`,
+    },
+    { label: section?._id === "" ? "New" : "Edit", isCurrentPage: true },
   ];
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
 
     setSection((prev) => ({
@@ -90,56 +117,65 @@ const NewSection = () => {
 
     const res = await createOrUpdateSection(section);
     if (res) {
-      toast.success('Success');
+      toast.success("Success");
+      navigate(-1);
+    }
+  };
+  const handleDelete = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const res = await createOrUpdateSection({ ...section, isDeleted: true });
+    if (res) {
+      toast.success("Success");
       navigate(-1);
     }
   };
 
   return (
     <Container>
-      <Title text='Lectures' />
+      <Title text="Lectures" />
       <Breadcrumb items={breadcrumbItems} />
       <form
-        className='w-full space-y-4 flex flex-wrap gap-2 mt-2'
+        className="w-full space-y-4 flex flex-wrap gap-2 mt-2"
         onSubmit={handleSubmit}
       >
         {formFields.map((field) => (
           <div
             key={field.name}
-            className={` w-full ${field.name === 'title' && 'lg:!-mt-[.5px] '}
-              ${field.name === 'title' || field.name === 'sectionType' ? 'lg:w-[49.5%]' : 'lg:w-full'}`}
+            className={` w-full ${field.name === "title" && "lg:!-mt-[.5px] "}
+              ${
+                field.name === "title" || field.name === "sectionType"
+                  ? "lg:w-[49.5%]"
+                  : "lg:w-full"
+              }`}
           >
             <Label>{field.label}</Label>
 
-            {field.type === 'option' ? (
+            {field.type === "option" ? (
               <Select
                 onValueChange={(value) => {
                   setSection((prev) => ({
                     ...prev,
-                    ['sectionType']: value,
+                    ["sectionType"]: value,
                   }));
                 }}
                 value={section[field.name as keyof SectionTypes] as string}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder='Select file type' />
+                  <SelectValue placeholder="Select file type" />
                 </SelectTrigger>
 
                 <SelectContent>
-                  <SelectItem
-                    value='word'
-                    className='hover:bg-white'
-                  >
+                  <SelectItem value="word" className="hover:bg-white">
                     Word Documents
                   </SelectItem>
-                  <SelectItem value='pdf'>PDF Document</SelectItem>
-                  <SelectItem value='excel'>Excel</SelectItem>
-                  <SelectItem value='video'>Video</SelectItem>
+                  <SelectItem value="pdf">PDF Document</SelectItem>
+                  <SelectItem value="excel">Excel</SelectItem>
+                  <SelectItem value="video">Video</SelectItem>
                 </SelectContent>
               </Select>
-            ) : field.type === 'textarea' ? (
+            ) : field.type === "textarea" ? (
               <Textarea
-                placeholder=''
+                placeholder=""
                 name={field.name}
                 value={section[field.name as keyof SectionTypes] as string}
                 onChange={handleChange}
@@ -149,43 +185,70 @@ const NewSection = () => {
             ) : (
               <Input
                 type={field.type}
-                placeholder=''
+                placeholder=""
                 name={field.name}
-                value={field.type === 'file' ? undefined : (section[field.name as keyof SectionTypes] as string)}
-                onChange={field.type === 'file' ? onFileUpload : handleChange}
+                value={
+                  field.type === "file"
+                    ? undefined
+                    : (section[field.name as keyof SectionTypes] as string)
+                }
+                onChange={field.type === "file" ? onFileUpload : handleChange}
               />
             )}
           </div>
         ))}
 
-        <div className='w-full'>
+        <div className="w-full">
           {section.cover && (
             <div>
-              <label className='block text-sm font-medium text-gray-700'>Current Banner</label>
-              <a
-                href={section.cover}
-                target='_blank'
-                rel='noopener noreferrer'
-              >
+              <label className="block text-sm font-medium text-gray-700">
+                Current Banner
+              </label>
+              <a href={section.cover} target="_blank" rel="noopener noreferrer">
                 <img
                   src={section.cover}
-                  alt='Course Cover'
-                  className='mt-2 w-32 h-32 object-cover rounded'
+                  alt="Course Cover"
+                  className="mt-2 w-32 h-32 object-cover rounded"
                 />
               </a>
             </div>
           )}
         </div>
-        <div>
-          <Button type='submit'>Add Lectures</Button>
-          <Button
-            className='ml-2'
-            variant='destructive'
-            type='button'
-            onClick={() => navigate(-1)}
-          >
-            Cancel
-          </Button>
+
+        <div className="flex items-center justify-between w-full pb-20">
+          <div className="m-0">
+            <Button type="submit">Add Lectures</Button>
+            <Button
+              className="ml-2"
+              variant="destructive"
+              type="button"
+              onClick={() => navigate(-1)}
+            >
+              Cancel
+            </Button>
+          </div>
+     {section?._id !==""&&      <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" type="button" className="m-0">
+                Delete Section
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  this lesson.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete}>
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>}
         </div>
       </form>
     </Container>

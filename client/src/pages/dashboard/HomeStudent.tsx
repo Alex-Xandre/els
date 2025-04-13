@@ -76,6 +76,7 @@ const HomeStudent = () => {
       <nav className='inline-flex items-center justify-between w-full pr-4 '>
         <div className='m-0'>
           <h1 className='text-2xl'> 👋 Hi there, {user?.personalData?.firstName} </h1>
+          <h2 className='ml-10'>Welcome to EPAS LMA </h2>
           <h2 className='text-xs ml-10'>Here is the summary of your activity</h2>
         </div>
 
@@ -84,9 +85,9 @@ const HomeStudent = () => {
             src={user.profile}
             className='h-8 w-8'
           />
-          <span className=' p-1 py-2 bg-sky-100 rounded'>
+          {/* <span className=' p-1 py-2 bg-sky-100 rounded'>
             <BellIcon className='h-4' />
-          </span>
+          </span> */}
         </div>
       </nav>
 

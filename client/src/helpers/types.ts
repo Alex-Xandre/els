@@ -43,13 +43,14 @@ export interface PersonalTypes {
 // User type
 export interface UserTypes {
   password: string;
-  role: 'admin' | 'user';
+  role: "admin" | "user";
   userId: string;
   _id: string;
   personalData: PersonalTypes;
   email: string;
   profile: string;
   status: boolean;
+  isDeleted?: boolean;
 }
 
 // Section type
@@ -65,6 +66,7 @@ export interface SectionTypes {
   updatedAt?: Date;
   cover: string;
   isUnlock?: boolean;
+  isDeleted?: boolean;
 }
 
 // Module type
@@ -75,7 +77,8 @@ export interface ModuleTypes {
   courseId: string;
   createdAt?: Date;
   updatedAt?: Date;
-  cover: '';
+  cover: string;
+  isDeleted?: boolean;
 }
 
 // Course type
@@ -87,18 +90,18 @@ export interface CourseTypes {
   category: string;
   createdAt?: Date;
   updatedAt?: Date;
-  cover: '';
+  cover: string;
 }
 
 export interface QuestionTypes {
   _id?: string;
   questionText: string;
-  questionType: 'multiple-choice' | 'enumeration' | 'identification' | 'essay';
+  questionType: "multiple-choice" | "enumeration" | "identification" | "essay";
   options: string[];
   correctAnswer: string | number | string[];
   explanation: string;
   questionPoints: number;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: "easy" | "medium" | "hard";
 }
 
 export interface AssesmentType {
@@ -110,13 +113,14 @@ export interface AssesmentType {
   assesmentDueDate: Date;
 
   timeLimit: number;
-  status: 'draft' | 'published';
+  status: "draft" | "published";
 
-  category: 'homework' | 'quiz' | 'activity';
+  category: "homework" | "quiz" | "activity";
   sectionType?: string;
   attempts?: number;
   isLate?: boolean;
   startDate: Date;
+  isDeleted?: boolean;
 }
 
 export interface ProgressType {
@@ -143,6 +147,6 @@ export interface TimelineActivityType {
   module: string;
   section?: string;
   activity?: string;
-  activityType: 'viewed' | 'started' | 'completed' | 'submitted';
+  activityType: "viewed" | "started" | "completed" | "submitted";
   text?: string;
 }

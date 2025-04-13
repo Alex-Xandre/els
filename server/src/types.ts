@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import { Request } from "express";
 
 export interface CustomRequest extends Request {
   user?: {
@@ -35,23 +35,24 @@ export interface PersonalTypes {
 //user types
 export interface UserTypes {
   password: string;
-  role: 'admin' | 'user';
+  role: "admin" | "user";
   userId: string;
   personalData: PersonalTypes;
   email: string;
   profile: string;
-  status:boolean
+  status: boolean;
+  isDeleted?: boolean;
 }
 
 export interface QuestionTypes {
   _id: string;
   questionText: string;
-  questionType: 'multiple-choice' | 'enumeration' | 'identification' | 'essay';
+  questionType: "multiple-choice" | "enumeration" | "identification" | "essay";
   options: string[];
   correctAnswer: string | number | string[];
   explanation: string;
   questionPoints: number;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: "easy" | "medium" | "hard";
 }
 
 export interface AssesmentType {
@@ -62,12 +63,10 @@ export interface AssesmentType {
   moduleId: string;
   assesmentDueDate: Date;
   timeLimit: number;
-  status: 'draft' | 'published';
+  status: "draft" | "published";
   category: string;
   cover?: string;
 
-
   sectionType?: string;
   attempts?: number;
-
 }

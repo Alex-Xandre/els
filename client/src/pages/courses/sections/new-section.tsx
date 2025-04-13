@@ -130,6 +130,24 @@ const NewSection = () => {
     }
   };
 
+  // Store the Google Drive link
+  const [embedUrl, setEmbedUrl] = useState("");
+
+  useEffect(() => {
+    if (section?.resource) {
+      // Extract the file ID from the Google Drive link using regex
+      const fileId = section?.resource.match(/\/d\/(.*?)\//);
+      if (fileId) {
+        // Construct the embed URL for the iframe
+        setEmbedUrl(`https://drive.google.com/file/d/${fileId[1]}/preview`);
+      } else {
+        setEmbedUrl("");
+      }
+    } else {
+      setEmbedUrl("");
+    }
+  }, [section?.resource]);
+
   return (
     <Container>
       <Title text="Lectures" />
@@ -198,31 +216,40 @@ const NewSection = () => {
             )}
           </div>
         ))}
-        {section.sectionType === "link" && (
-          <>
-            <Label>Drive Link</Label>
+        {section._id !== "" &&
+          section?.resource &&
+          section?.sectionType === "link" && (
+            <div className="relative w-[700px] h-[500px]">
+              <iframe
+                src={embedUrl}
+                className="absolute top-0 left-0 w-full h-full z-10"
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+                sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                title="Google Drive Video"
+              />
+              <div
+                onClick={() => toast.error("Sharing not allowed")}
+                className="absolute top-0 right-0 w-12
+               h-12
+               bg-transparent 
+               z-20"
+              />
+            </div>
+          )}
 
-            <Input
-              className="-mt-5"
-              type="text"
-              placeholder=""
-              name="resource"
-              value={section["resource" as keyof SectionTypes] as string}
-              onChange={handleChange}
-            />
-          </>
-        )}
-
-        {section._id !== "" && section?.resource && (
-          <a
-            href={section.resource}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-700 underline text-sm !mt-5"
-          >
-            {section?.title}
-          </a>
-        )}
+        {section._id !== "" &&
+          section?.resource &&
+          section?.sectionType !== "link" && (
+            <a
+              href={section.resource}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-700 underline text-sm !mt-5"
+            >
+              {section?.title}
+            </a>
+          )}
 
         <div className="w-full">
           {section.cover && (

@@ -91,6 +91,8 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
         />
       </div>
 
+
+
       {/* Content */}
       <div className='p-4'>
         {/* Title */}

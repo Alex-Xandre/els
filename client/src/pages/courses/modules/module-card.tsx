@@ -130,17 +130,17 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
         <div className='flex items-center justify-between'>
           {/* Sections */}
           <div>
-            {sections.filter((x) => x.moduleId?._id === module._id).length > 0 && (
+            {sections.filter((x) => x.moduleId?._id === module._id && x?.isDeleted === false).length > 0 && (
               <span className='inline-flex items-center text-green-900 text-xs'>
-                {sections.filter((x) => x.moduleId?._id === module._id).length}
+                {sections.filter((x) => x.moduleId?._id === module._id && x?.isDeleted === false).length}
                 <FolderIcon className='h-3' />
               </span>
             )}
 
             {/* Activities */}
-            {activity.filter((x) => x.moduleId?._id === module._id).length > 0 && (
+            {activity.filter((x) => x.moduleId?._id === module._id && x?.isDeleted === false).length > 0 && (
               <span className='inline-flex items-center text-green-900 text-xs'>
-                {activity.filter((x) => x.moduleId?._id === module._id).length}
+                {activity.filter((x) => x.moduleId?._id === module._id && x?.isDeleted === false).length}
                 <BookCheckIcon className='h-3' />
               </span>
             )}

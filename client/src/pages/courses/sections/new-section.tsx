@@ -203,7 +203,7 @@ const NewSection = () => {
             <Label>Drive Link</Label>
 
             <Input
-            className="-mt-5"
+              className="-mt-5"
               type="text"
               placeholder=""
               name="resource"
@@ -211,6 +211,17 @@ const NewSection = () => {
               onChange={handleChange}
             />
           </>
+        )}
+
+        {section._id !== "" && section?.resource && (
+          <a
+            href={section.resource}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-700 underline text-sm !mt-5"
+          >
+            {section?.title}
+          </a>
         )}
 
         <div className="w-full">
